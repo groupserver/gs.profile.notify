@@ -4,6 +4,7 @@ from zope.interface import implements, implementedBy
 from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
 from interfaces import IGSNotifyUser
+from audit import Auditor, SEND_NOTIFICATION, SEND_MESSAGE
 
 class NotifyUser(object):
     implements( IGSNotifyUser )
@@ -12,8 +13,15 @@ class NotifyUser(object):
     def __init__(self, user):
         self.user = user
         self.siteInfo = createObject('groupserver.SiteInfo', user)
-        self.__addresses = self.__emailTemplates = self.__mailhost = None
-
+        self.__addresses = self.__emailTemplates = None
+        self.__auditor = self.__mailhost = None
+    
+    @property
+    def auditor(self):
+        if self.__auditor == None:
+            self.__auditor = Auditor(self.siteInfo, self.user)
+        return self.__auditor
+        
     @property
     def addresses(self):
         if self.__addresses == None:
@@ -52,17 +60,18 @@ class NotifyUser(object):
     def send_notification(self, n_type, n_id='default', n_dict=None, email_only=()):
         if not n_dict:
             n_dict = {}
-        # TODO Audit
+        self.auditor.info(SEND_NOTIFICATION, n_type, n_id)
         for address in self.get_addresses(email_only):
             msg = self.render_notification(n_type, n_id, n_dict, address)
-            self.send_message(msg, address)
+            if msg:
+                self.send_message(msg, address)
                      
     def send_message(self, message, email_to, email_from=''):
         assert email_to in self.addresses, \
             '%s is not an address for %s' % (email_to, self.user.getId())
         if not email_from:
             email_from = get_support_email(self.user, self.siteInfo.id)
-        # TODO: Audit
+        self.auditor.info(SEND_MESSAGE, len(message), email_to)
         self.mailhost._send(mfrom=email_from, mto=email_to, 
                             messageText=message)
         
@@ -77,7 +86,6 @@ class NotifyUser(object):
         template = (getattr(ptype_templates.aq_explicit, n_id, None) or
                     getattr(ptype_templates.aq_explicit, 'default', None))
         assert template, 'No template found'
-        # --=mpj17=-- changed self.REQUEST to None
         retval = template(self.user, None, to_addr=email_address, 
                             n_id=n_id, n_type=n_type, n_dict=n_dict)
         if isinstance(retval, unicode):
@@ -88,7 +96,6 @@ class NotifyUser(object):
 class NotifyUserFromUserInfo(NotifyUser):
     implements( IGSNotifyUser )
     adapts( IGSUserInfo )
-
     def __init__(self, userInfo):
         NotifyUser.__init__(userInfo.user)
 

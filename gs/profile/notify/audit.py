@@ -21,7 +21,7 @@ UNKNOWN           = '0'
 SEND_NOTIFICATION = '1'
 SEND_MESSAGE      = '2'
 
-class NotifyEventFactory(object):
+class AuditEventFactory(object):
     implements(IFactory)
 
     title=u'User Profile Notification Audit-Event Factory'
@@ -63,11 +63,10 @@ class SendNotificationEvent(BasicAuditEvent):
 
     def __init__(self, context, id, d, userInfo, siteInfo, 
                     instanceDatum,  supplementaryDatum):
-        
-        BasicAuditEvent.__init__(self, context, id, 
-          INVITE_NEW_USER, d, userInfo, instanceUserInfo, 
-          siteInfo, None,  instanceDatum, supplementaryDatum, 
-          SUBSYSTEM)
+        BasicAuditEvent.__init__(self, context, id, SEND_NOTIFICATION, 
+                                    d, userInfo, None,  siteInfo, None,  
+                                    instanceDatum, supplementaryDatum, 
+                                    SUBSYSTEM)
     
     def __str__(self):
         retval = u'Sending the notification %s/%s to %s (%s) on %s (%s)' %\
@@ -121,10 +120,12 @@ class SendMessageEvent(BasicAuditEvent):
 
 class Auditor(object):
     def __init__(self, siteInfo, user):
+        assert siteInfo, 'siteInfo is %s' % siteInfo
+        assert user, 'user is %s' % user
         self.siteInfo  = siteInfo
         self.userInfo  = IGSUserInfo(user)
-        
-        da = userInfo.user.zsqlalchemy
+
+        da = self.userInfo.user.zsqlalchemy
         self.queries = AuditQuery(da)
       
         self.factory = AuditEventFactory()
@@ -135,7 +136,7 @@ class Auditor(object):
             self.siteInfo, code, instanceDatum, supplementaryDatum)
           
         e = self.factory(self.userInfo.user, eventId,  code, d, 
-                None,  self.userInfo, self.siteInfo, None,
+                self.userInfo, None, self.siteInfo, None,
                 instanceDatum, supplementaryDatum, SUBSYSTEM)
           
         self.queries.store(e)
