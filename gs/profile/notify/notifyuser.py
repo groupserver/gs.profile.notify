@@ -1,8 +1,9 @@
 # coding=utf-8
-from zope.component import createObject
-from XWFUtils import get_support_email
+from zope.component import createObject, adapts
+from zope.interface import implements, implementedBy
+from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
-from interfaces import INotifyUser
+from interfaces import IGSNotifyUser
 
 class NotifyUser(object):
     implements( IGSNotifyUser )
