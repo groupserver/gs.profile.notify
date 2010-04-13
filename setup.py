@@ -27,7 +27,7 @@ setup(name='gs.profile.notify',
     url='http://www.onlinegroups.net/',
     license='other',
     packages=find_packages(exclude=['ez_setup']),
-    namespace_packages=['gs','profile'],
+    namespace_packages=['gs','gs.profile'],
     include_package_data=True,
     zip_safe=True,
     install_requires=[
