@@ -17,13 +17,14 @@ class NotifyUser(object):
     @property
     def addresses(self):
         if self.__addresses == None:
-            self.__addresses = [e.lower in self.user.get_emailAddresses()]
+            self.__addresses = [e.lower() for e in 
+                                self.user.get_emailAddresses()]
         return self.__addresses
 
     @property
     def mailhost(self):
         if self.__mailhost == None:
-            sr = user.site_root()
+            sr = self.user.site_root()
             try:
                 self.__mailhost = sr.superValues('Mail Host')[0]
             except:
@@ -33,7 +34,7 @@ class NotifyUser(object):
     @property
     def emailTemplates(self):
         if self.__emailTemplates == None:
-            sr = user.site_root()
+            sr = self.user.site_root()
             assert sr
             self.__emailTemplates = sr.Templates.email.notifications.aq_explicit
         return self.__emailTemplates
