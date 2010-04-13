@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configure xmlns="http://namespaces.zope.org/zope"
+  xmlns:browser="http://namespaces.zope.org/browser"
+  xmlns:rdb="http://namespaces.zope.org/rdb"
+  xmlns:sqlos="http://namespaces.sqlobject.org/sqlos"
+  xmlns:five="http://namespaces.zope.org/five">
+
+  <interface 
+    interface=".interfaces.IGSNotifyUser" />
+
+  <five:implements 
+    class=".notifyuser.NotifyUser"
+    interface=".interfaces.IGSNotifyUser" />
+  <adapter provides=".interfaces.IGSNotifyUser"
+    for="Products.CustomUserFolder.interfaces.ICustomUser"
+    permission="zope2.Public"
+    factory=".notifyuser.NotifyUser"/>
+
+  <five:implements 
+    class=".notifyuser.NotifyUserFromUserInfo"
+    interface=".interfaces.IGSNotifyUser" />    
+  <adapter provides=".interfaces.IGSNotifyUser"
+    for="Products.CustomUserFolder.interfaces.IGSUserInfo"
+    permission="zope2.Public"
+    factory=".notifyuser.NotifyUserFromUserInfo"/>
+
+</configure>
+
