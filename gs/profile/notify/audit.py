@@ -73,7 +73,7 @@ class SendNotificationEvent(BasicAuditEvent):
           (self.instanceDatum, self.supplementaryDatum,
           self.userInfo.name, self.userInfo.id,
           self.siteInfo.name, self.siteInfo.id)
-        return retval
+        return retval.encode('ascii', 'ignore')
 
     @property
     def xhtml(self):
@@ -108,7 +108,7 @@ class SendMessageEvent(BasicAuditEvent):
           (self.instanceDatum, self.supplementaryDatum,
             self.userInfo.name, self.userInfo.id,
             self.siteInfo.name, self.siteInfo.id)
-        return retval
+        return retval.encode('ascii', 'ignore')
 
     @property
     def xhtml(self):

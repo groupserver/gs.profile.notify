@@ -97,5 +97,5 @@ class NotifyUserFromUserInfo(NotifyUser):
     implements( IGSNotifyUser )
     adapts( IGSUserInfo )
     def __init__(self, userInfo):
-        NotifyUser.__init__(userInfo.user)
+        NotifyUser.__init__(self, userInfo.user)
 
