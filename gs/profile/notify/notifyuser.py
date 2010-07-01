@@ -52,7 +52,7 @@ class NotifyUser(object):
             toAddrs = [e.lower() for e in email_only]
             retval = [e for e in self.addresses if e.lower() in toAddrs]
         else:
-            retval = [e.lower() for i in self.user.get_verifiedEmailAddresses()]
+            retval = [e.lower() for e in self.user.get_verifiedEmailAddresses()]
         assert type(retval) == list
         assert retval, 'No email addresses to send the notification to.'
         return retval
@@ -71,7 +71,7 @@ class NotifyUser(object):
             '%s is not an address for %s' % (email_to, self.user.getId())
         if not email_from:
             email_from = get_support_email(self.user, self.siteInfo.id)
-        self.auditor.info(SEND_MESSAGE, len(message), email_to)
+        self.auditor.info(SEND_MESSAGE, str(len(message)), email_to)
         self.mailhost._send(mfrom=email_from, mto=email_to, 
                             messageText=message)
         
