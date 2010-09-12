@@ -67,7 +67,7 @@ class NotifyUser(object):
                 self.send_message(msg, address)
                      
     def send_message(self, message, email_to, email_from=''):
-        assert email_to in self.addresses, \
+        assert email_to.lower() in self.addresses, \
             '%s is not an address for %s' % (email_to, self.user.getId())
         if not email_from:
             email_from = get_support_email(self.user, self.siteInfo.id)
