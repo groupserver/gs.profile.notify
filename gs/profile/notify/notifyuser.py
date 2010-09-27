@@ -10,9 +10,11 @@ class NotifyUser(object):
     implements( IGSNotifyUser )
     adapts( ICustomUser )
 
-    def __init__(self, user):
+    def __init__(self, user, siteInfo=None):
         self.user = user
         self.siteInfo = createObject('groupserver.SiteInfo', user)
+        if siteInfo:
+            self.siteInfo = siteInfo
         self.__addresses = self.__emailTemplates = None
         self.__auditor = self.__mailhost = None
     
