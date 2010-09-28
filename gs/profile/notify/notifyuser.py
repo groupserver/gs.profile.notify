@@ -12,9 +12,9 @@ class NotifyUser(object):
 
     def __init__(self, user, siteInfo=None):
         self.user = user
-        self.siteInfo = createObject('groupserver.SiteInfo', user)
-        if siteInfo:
-            self.siteInfo = siteInfo
+        self.siteInfo = siteInfo
+        if not self.siteInfo:
+            self.siteInfo = createObject('groupserver.SiteInfo', user)
         self.__addresses = self.__emailTemplates = None
         self.__auditor = self.__mailhost = None
     
