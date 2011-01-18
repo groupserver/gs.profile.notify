@@ -1,10 +1,11 @@
 # coding=utf-8
 from zope.component import createObject, adapts
-from zope.interface import implements, implementedBy
+from zope.interface import implements
 from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
 from interfaces import IGSNotifyUser
 from audit import Auditor, SEND_NOTIFICATION, SEND_MESSAGE
+from gs.profile.email.base.emailuser import EmailUser
 
 class NotifyUser(object):
     implements( IGSNotifyUser )
@@ -17,6 +18,14 @@ class NotifyUser(object):
             self.siteInfo = createObject('groupserver.SiteInfo', user)
         self.__addresses = self.__emailTemplates = None
         self.__auditor = self.__mailhost = None
+        self.__emailUser = None
+    
+    @property
+    def emailUser(self):
+        if self.__emailUser == None:
+            userInfo = IGSUserInfo(self.user)
+            self.__emailUser = EmailUser(self.user, userInfo)
+        return self.__emailUser
     
     @property
     def auditor(self):
@@ -28,7 +37,7 @@ class NotifyUser(object):
     def addresses(self):
         if self.__addresses == None:
             self.__addresses = [e.lower() for e in 
-                                self.user.get_emailAddresses()]
+                                self.emailUser.get_addresses()]
         return self.__addresses
 
     @property
@@ -54,7 +63,7 @@ class NotifyUser(object):
             toAddrs = [e.lower() for e in email_only]
             retval = [e for e in self.addresses if e.lower() in toAddrs]
         else:
-            retval = [e.lower() for e in self.user.get_verifiedEmailAddresses()]
+            retval = [e.lower() for e in self.emailUser.get_verified_addresses()]
         assert type(retval) == list
         assert retval, 'No email addresses to send the notification to.'
         return retval
