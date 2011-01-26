@@ -1,7 +1,8 @@
 # coding=utf-8
-from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
 from email.Header import Header
 from Products.XWFCore.XWFUtils import get_support_email
+from Products.CustomUserFolder.interfaces import IGSUserInfo
+from gs.profile.email.base.emailuser import EmailUser
 
 utf8='utf-8'
 
@@ -24,7 +25,8 @@ class Addressee(object):
     def __init__(self, userInfo, address):
         self.userInfo = userInfo
         self.addr = address.strip()
-        userAddrs = [l.lower() for l in userInfo.user.get_emailAddresses()]
+        eu = EmailUser(userInfo.user, userInfo)
+        userAddrs = [l.lower() for l in eu.get_addresses()]
         assert address.lower() in userAddrs, '%s not in %s' % \
             (address.lower(), userAddrs)
 
