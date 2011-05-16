@@ -4,6 +4,9 @@ from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.utils import formataddr
+from zope.i18nmessageid import MessageFactory
+_ = MessageFactory('groupserver')
+from Products.XWFCore.XWFUils import get_support_email
 from Products.CustomUserFolder.interfaces.IGSUserInfo
 from notifyuser import NotifyUser
 
@@ -40,11 +43,18 @@ class MessageSender(object):
         return container
 
     def from_header_from_address(self, address):
-        # TODO: support if address is none
-        u = self.context.acl_users.get_userByEmail(address)
-        assert u, 'Could not find user for <%s>' % address
-        userInfo = IGSUserInfo(u)
-        retval = formataddr((userInfo.name, address))
+        if address:
+            u = self.context.acl_users.get_userByEmail(address)
+            assert u, 'Could not find user for <%s>' % address
+            userInfo = IGSUserInfo(u)
+            retval = formataddr((userInfo.name, address))
+        else:
+            siteInfo = createObject('groupserver.SiteInfo', self.context)
+            siteId = siteInfo.id
+            assert siteId, 'Could not get the site ID'
+            name = siteInfo.name +_(' Support')
+            email = get_support_email(self.context, siteId)
+            retval = formatadddr((name, email))
         assert retval
         return retval
 
