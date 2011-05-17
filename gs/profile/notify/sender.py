@@ -66,7 +66,7 @@ class MessageSender(object):
 
     def to_header_from_addresses(self, addresses):
         if not addresses:
-            emailUser = EmailUser(self.context, toUserInfo)
+            emailUser = EmailUser(self.context, self.toUserInfo)
             addresses = emailUser.get_delivery_addresses()
         assert addresses, 'No addresses for %s (%s)' % \
             (self.toUserInfo.name, self.toUserInfo.id)
