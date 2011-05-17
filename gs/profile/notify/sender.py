@@ -16,6 +16,7 @@ class MessageSender(object):
     def __init__(self, context, toUserInfo):
         self.context = context
         self.toUserInfo = toUserInfo
+        self.emailUser = EmailUser(self.context, self.toUserInfo)
         
     def send_message(self, subject, txtMessage, htmlMessage='', 
                         fromAddress=None, toAddresses=None):
@@ -23,7 +24,7 @@ class MessageSender(object):
                                   fromAddress, toAddresses)
         notifyUser = NotifyUser(self.toUserInfo.user)
         if not toAddresses:
-            toAddresses = notifyUser.addresses
+            toAddresses = self.emailUser.get_delivery_addresses()
         for addr in toAddresses:
             notifyUser.send_message(msg, addr, fromAddress)
             
@@ -66,8 +67,7 @@ class MessageSender(object):
 
     def to_header_from_addresses(self, addresses):
         if not addresses:
-            emailUser = EmailUser(self.context, self.toUserInfo)
-            addresses = emailUser.get_delivery_addresses()
+            addresses = self.emailUser.get_delivery_addresses()
         assert addresses, 'No addresses for %s (%s)' % \
             (self.toUserInfo.name, self.toUserInfo.id)
         fn = self.toUserInfo.name.encode(utf8)
