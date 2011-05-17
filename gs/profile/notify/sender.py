@@ -23,7 +23,7 @@ class MessageSender(object):
                                   fromAddress, toAddresses)
         notifyUser = NotifyUser(self.toUserInfo.user)
         if not toAddresses:
-            toAddresses = self.notifyUser.addresses
+            toAddresses = notifyUser.addresses
         for addr in toAddresses:
             notifyUser.send_message(msg, addr, fromAddress)
             
