@@ -8,6 +8,7 @@ from zope.i18nmessageid import MessageFactory
 _ = MessageFactory('groupserver')
 from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import IGSUserInfo
+from gs.profile.email.base.emailuser import EmailUser
 from notifyuser import NotifyUser
 utf8 = 'utf-8'
 
@@ -15,16 +16,16 @@ class MessageSender(object):
     def __init__(self, context, toUserInfo):
         self.context = context
         self.toUserInfo = toUserInfo
-        self.notifyUser = NotifyUser(toUserInfo.user)
         
     def send_message(self, subject, txtMessage, htmlMessage='', 
                         fromAddress=None, toAddresses=None):
         msg = self.create_message(subject, txtMessage, htmlMessage, 
                                   fromAddress, toAddresses)
+        notifyUser = NotifyUser(self.toUserInfo.user)
         if not toAddresses:
             toAddresses = self.notifyUser.addresses
         for addr in toAddresses:
-            self.notifyUser.send_message(msg, addr, fromAddress)
+            notifyUser.send_message(msg, addr, fromAddress)
             
     def create_message(self, subject, txtMessage, htmlMessage, 
                         fromAddress, toAddresses):
@@ -65,7 +66,8 @@ class MessageSender(object):
 
     def to_header_from_addresses(self, addresses):
         if not addresses:
-            addresses = self.notifyUser.addresses
+            emailUser = EmailUser(self.context, toUserInfo)
+            addresses = emailUser.get_delivery_addresses()
         assert addresses, 'No addresses for %s (%s)' % \
             (self.toUserInfo.name, self.toUserInfo.id)
         fn = self.toUserInfo.name.encode(utf8)
