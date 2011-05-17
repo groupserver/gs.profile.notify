@@ -32,6 +32,7 @@ setup(name='gs.profile.notify',
     zip_safe=True,
     install_requires=[
         'setuptools',
+        'gs.profile.email.base',
         # -*- Extra requirements: -*-
     ],
     entry_points="""
