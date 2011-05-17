@@ -21,7 +21,6 @@ class MessageSender(object):
                         fromAddress=None, toAddresses=None):
         msg = self.create_message(subject, txtMessage, htmlMessage, 
                                   fromAddress, toAddresses)
-        print msg
         if not toAddresses:
             toAddresses = self.notifyUser.addresses
         for addr in toAddresses:
