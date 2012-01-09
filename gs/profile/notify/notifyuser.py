@@ -3,9 +3,9 @@ from zope.component import createObject, adapts
 from zope.interface import implements
 from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
+from gs.profile.email.base.emailuser import EmailUser
 from interfaces import IGSNotifyUser
 from audit import Auditor, SEND_NOTIFICATION, SEND_MESSAGE
-from gs.profile.email.base.emailuser import EmailUser
 
 class NotifyUser(object):
     implements( IGSNotifyUser )
