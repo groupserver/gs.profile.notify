@@ -5,6 +5,7 @@ from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.utils import formataddr
 from zope.i18nmessageid import MessageFactory
+from zope.component import createObject
 _ = MessageFactory('groupserver')
 from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import IGSUserInfo
@@ -61,7 +62,7 @@ class MessageSender(object):
             assert siteId, 'Could not get the site ID'
             name = siteInfo.name +_(' Support')
             email = get_support_email(self.context, siteId)
-            retval = formatadddr((name.encode(utf8), email))
+            retval = formataddr((name.encode(utf8), email))
         assert retval
         return retval
 
