@@ -6,6 +6,7 @@ from email.MIMEMultipart import MIMEMultipart
 from email.utils import formataddr
 from zope.i18nmessageid import MessageFactory
 from zope.component import createObject
+from zope.cachedescriptors.property import Lazy
 _ = MessageFactory('groupserver')
 from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import IGSUserInfo
@@ -23,11 +24,13 @@ class MessageSender(object):
                         fromAddress=None, toAddresses=None):
         msg = self.create_message(subject, txtMessage, htmlMessage, 
                                   fromAddress, toAddresses)
+        print '\nSubject: %s\n' % subject
         notifyUser = NotifyUser(self.toUserInfo.user)
         if not toAddresses:
             toAddresses = self.emailUser.get_delivery_addresses()
+        fromAddr = self.from_address(fromAddress)
         for addr in toAddresses:
-            notifyUser.send_message(msg, addr, fromAddress)
+            notifyUser.send_message(msg, addr, fromAddr)
             
     def create_message(self, subject, txtMessage, htmlMessage, 
                         fromAddress, toAddresses):
@@ -50,6 +53,16 @@ class MessageSender(object):
         assert retval
         return retval
 
+    def from_address(self, address):
+        if address:
+            retval = address
+        else:
+            siteInfo = createObject('groupserver.SiteInfo', self.context)
+            siteId = siteInfo.id
+            assert siteId, 'Could not get the site ID'
+            retval = get_support_email(self.context, siteId)
+        return retval
+        
     def from_header_from_address(self, address):
         if address:
             u = self.context.acl_users.get_userByEmail(address)
