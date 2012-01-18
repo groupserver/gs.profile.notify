@@ -1,0 +1,692 @@
+=========================
+GroupServer Notifications
+=========================
+
+:Authors: Alice Murphy; Michael JasonSmith
+:Contact: Michael JasonSmith <mpj17@onlinegroups.net>
+:Organization: `GroupServer.org`_
+:Date: 2012-01-17
+:Copyright: This document is licensed under a
+  `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
+  by `OnlineGroups.Net`_.
+
+.. contents:: `Table of contents`
+   :depth: 2
+
+Notifications are small messages that are sent to the user outside the
+group-email context. They include messages such as the `invitation`_
+to join a group, and the `group welcome`_ email. In this document we
+describe the various notifications sent by GroupServer. We summarise
+who they are sent to, and the code-path that is followed to send
+the notification.
+
+Currently the notifications are being transitioned to their third
+version. These `file-system-side notifications`_ are are more flexible
+than the old `notification templates`_. The notifications in different
+sub-systems will be converted to file-system side notifications when
+each module is reviewed in the normal process of software maintenance
+and refactoring.
+
+Finally, we end with a review of the `email templates`_ that are
+used for sending email messages, and as responses to commands that
+are sent by email.
+
+File-System-Side Notifications
+==============================
+
+There are not yet many notifications in the file system, but this is
+the direction in which we are heading. As we rebuild each subsystem,
+we will move its notifications to the file system.
+
+The file-system-side notifications work like Web pages. The
+notification system renders two pages — an HTML page and a
+plain-text version of the same message — and places them in an
+email message. All of the new fine-system-side notifications use
+``gs.profile.notify.sender.MessageSender`` to send the message.
+
+Invitation
+----------
+
+An invitation is a message from an administrator asking someone to
+join the group. It is also used to present the administrator with a
+*preview* of the invitation.
+
+**Sent to**
+  | Someone who has been invited to join a group by the administrator.
+**URL**
+  | *Group page* ``/invitationmessage.html``
+**via**
+  | ``gs.group.member.invite.invite.InviteEditProfileForm``
+  | ``gs.group.member.invite.inviter.Inviter``
+  | ``gs.group.member.invite.notify.InvitationNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+**TODO**
+  | Invite Site Members
+  | Invite CSV
+  | Resend Invitation (Manage Members)
+
+Group Welcome
+-------------
+
+The *Group Welcome* notification is sent to a new member when he or
+she joins a group. However, there are many ways of becoming a member,
+and some still use the old code, rather than this shiny method (see
+`add_group`_ below).
+
+Site administrators receive the `New Member`_ notification.
+
+**Sent to**
+  | A new member of a group.
+**URL**
+  | *Group page* ``/new-member-msg.html``
+**via**
+  | A *logged in member* clicks ``Join`` in a Public group.
+  | ``gs.group.join.join.JoinForm``
+  | ``gs.group.join.notify.NotifyNewMember``
+  | ``gs.profile.notify.sender.MessageSender``
+**TODO**
+  | A new **invited** member accepts an invitation to join a group
+  | ``gs.profile.invite.initalresponse``
+  |
+  | An existing **invited** member accepts an invitation to join a 
+    group.
+  | ``gs.profile.invite.invitationsrespond``
+  |
+  | An administrator accepts the *request* to join the group.
+  | ``gs.group.member.request.request.respond.Respond``
+  |
+  | An administrator starts a group, and is made the first member
+  | ``gs.group.start.StartGroupForm``
+  |
+  | A new member joins a group during **Sign Up**
+  | ``gs.profile.signup.base.ChangeProfileForm`` or the ``…verifywait.VerifyWaitForm``
+
+New Member
+----------
+
+Sent to the group administrators when a new member joins the group. It
+is the flip-side of the `group welcome`_ notification.
+
+**Sent to**
+  | The group administrators, or the site administrators if there are 
+  | no group administrators.
+**URL**
+  | *Group page* ``/new-member-admin-msg.html``
+**via**
+  | A *logged in member* clicks ``Join`` in a Public group.
+  | ``gs.group.join.join.JoinForm``
+  | ``gs.group.join.notify.NotifyAdmin``
+  | ``gs.profile.notify.sender.MessageSender``
+**TODO**
+  | A new **invited** member accepts an invitation to join a group
+  | ``gs.profile.invite.initalresponse``
+  |
+  | An existing **invited** member accepts an invitation to join a 
+    group.
+  | ``gs.profile.invite.invitationsrespond``
+  |
+  | An administrator accepts the *request* to join the group.
+  | ``gs.group.member.request.request.respond.Respond``
+  |
+  | An administrator starts a group, and is made the first member
+  | ``gs.group.start.StartGroupForm``
+  |
+  | A new member joins a group during **Sign Up**
+  | ``gs.profile.signup.base.ChangeProfileForm`` or the
+    ``…verifywait.VerifyWaitForm``
+
+
+Verify Email Address
+--------------------
+
+Email addresses must be verified. The verification message is sent
+from everywhere that email addresses can be added. It turns out that
+there are *many* places that an email address can be added.
+
+**Sent to**
+  | The person who has the new address.
+**URL**
+  | *Profile page* ``/verification-mesg.html``
+
+**TODO**
+
+  * Sign up (``gs.profile.signup``)
+
+    + Start sign up
+    + Resend verification
+    + New email address
+    
+  * Change email settings (``gs.profile.email.settings``)
+
+    + Add Email Address
+    + Resend Verification
+
+Request Membership
+------------------
+
+This message is sent when someone requests to become a member of a
+Private group. It is the opposite of a `invitation`_. It should not
+be confused with `request_contact`_.
+
+**Sent to**
+  | The administrator of the group.
+**URL**
+  | *Group page* ``/request_message.html``
+**via**
+  | ``gs.group.member.request.request.RequestForm``
+  | ``gs.profile.notify.sender.MessageSender``
+  
+Topic Digest
+------------
+
+The topic digest contains a summary of the topics that were discussed
+recently in the group. A "cron-job" is used to regularly send out
+the digests.
+
+The topic digest is the oldest file-system-side notifications. It
+was partly an experiment in how to create such a system. As
+such, it requires a rewrite to bring it into line with the other
+file-system-side notifications, which use the ``MessageSender`` class.
+
+**Sent to**
+  | All group members who have elected to receive posts in digest form.
+**URL**
+  | *Group Page* ``/digest.txt``    
+**via**
+  | ``ListManager/process_all_digests.py``
+  | ``Products.XWFMailingListManager.XWFMailingList.manage_digestBoxer``
+  |   ``Products.GSSearch.topicdigestview.TopicDigestView``
+  |   ``Templates.email.list.digest``
+  | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
+  |
+  | ``ListManager/process_new_digests.py``
+  | ``Products.XWFMailingListManager.XWFMailingList.manage_digestBoxer``
+  |   ``Products.GSSearch.topicdigestview.TopicDigestView``
+  |   ``Templates.email.list.digest``
+  | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
+
+Notification Templates
+======================
+
+These are the old notifications. They are DTML templates : this is the folder in which 
+``Products.CustomUserFolder.Customuser.send_notification`` looks to find the 
+notifications passed to it by ID.
+
+``add_group``
+-------------
+
+Sent to a group member upon joining a group. This is the old version of
+the `Group Welcome`_ notification, which is still used by some old code.
+
+**Sent to**
+  | The new group member.
+**via**
+  | An administrator creates a new group, and is automatically joined 
+    to it.
+  | ``Products.GroupServer.Scripts.forms.start_a_group.start``
+  | ``Products.GroupServer.Scripts.forms.start_a_group.addgroup``
+  | ``Products.GroupServer.Scripts.forms.start_a_group.create.default_administrator``
+  | ``Products.CustomUserFolder.CustomUser.add_groupWithNotification``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+
+``admin_create_new_user``
+-------------------------
+
+The **invitation** to join a group that is sent to a new user when
+the user is created upon being invited. It contains one link to accept
+the invitation, and another to decline. If the invitation is declined,
+then the user object is destroyed. It is now being replaced with the
+new `invitation`_ notification.
+
+**Sent to**
+  | A newly created user and prospective member.
+
+**via**
+  | ``...``
+  | (The Invitations system is currently undergoing changes. This information 
+  |  will be added once the new page is deployed.)
+
+``admin_create_new_user_rejected``
+----------------------------------
+
+Sent to all administrators of a group when an invitation to join the
+group is **declined.**
+
+**Sent to**
+  | All administrators of the group.
+
+**via**
+  | ``...``
+  | (The Invitations system is currently undergoing changes. This information 
+  |  will be added once the new page is deployed.)
+
+
+``bounce_detection``
+--------------------
+
+Sent to a user when it is detected that one of their email addresses
+is not accepting email that GroupServer attempts to deliver (the
+address is "bouncing"). The notification is sent to all *other*
+addresses that the user has registered, up to once per day.
+
+**Sent to**
+  | The member, at their other email addresses.
+
+**via**
+  | ``Products.XWFMailingListManager.processBounce``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+
+``disabled_email``
+------------------
+
+Sent to a user when it is detected that one of their email addresses
+has refused to accept email from GroupServer for five or more unique
+days out of the last 60. The notification is sent to all other
+addresses that the user has added to his or her profile.
+
+**Sent to**
+  | The member, at their other email addresses.
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingListManager.processBounce``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+
+``cannot_post``
+---------------
+
+Sent to a user when they attempt to post to a group, but
+are disallowed. The content of the message comes from the
+``gs.group.member.canpost`` system.
+
+**Sent to**
+  | The member of the group that cannot post.
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.checkMail``
+
+
+``del_group``
+-------------
+
+Sent to a member when they leave a group.
+
+**Sent to**
+  | The former member of the group, that has just left.
+
+**via**
+  | An **unsubscribe** confirmation is received by the group mailing list 
+    from an email address belonging to a group member.
+  | ``Products.XWFMailingListManager.XWFMailingList.manage_delMember``
+  | ``Products.CustomUserFolder.CustomUser.del_groupWithNotification``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  |
+  | A logged in member clicks ``Leave`` on the groups page or a group 
+    homepage.
+  | ``Products.GroupServer.Scripts.set.subscribe_group``
+  | ``Products.CustomUserFolder.CustomUser.del_groupWithNotification``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  |
+  | An administrator removes a member from the group.
+  | ``...``
+  |  (The Manage Members page is currently undergoing changes. This information 
+  |   will be added once the new page is deployed.)
+
+
+``invite_join_group_accepted``
+------------------------------
+
+The existing user who was invited to a group accepts the invitation.
+
+**Sent to**
+  | The administrator who sent the invitation.
+
+**via**
+  | ``...``
+  | (The Invitations system is currently undergoing changes. 
+    This information will be added once the new page is deployed.)
+
+
+``invite_join_group_declined``
+------------------------------
+
+The existing user who was invited to a group declines the invitation.
+
+**Sent to**
+  | The administrator who sent the invitation.
+
+**via**
+  | ``...``
+  | (The Invitations system is currently undergoing changes. This
+    information will be added once the new page is deployed.)
+
+
+``leave_group_admin``
+---------------------
+
+Notify the administrators and the participation coach that a member has 
+left the group.
+
+**Sent to**
+  | The participation coach.
+
+**via**
+  | A logged in **member** clicks ``Leave`` on the groups index page or 
+    the group homepage.
+  | ``Products.GroupServer.Scripts.set.subscribe_group``
+  | ``Products.CustomUserFolder.CustomUser.add_groupWithNotification``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  |
+  | **An administrator** who is not the participation coach removes a
+    member from the group.
+  | ``...``
+  | (The Manage Members page is currently undergoing changes. This information 
+  |  will be added once the new page is deployed.)
+  | ``Products.CustomUserFolder.CustomUser.add_groupWithNotification``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+
+``request_contact``
+-------------------
+
+A user requests contact with another.
+
+**Sent to**
+  | The member that is being petitioned for contact.
+
+**via**
+  | ``Products.GSProfile.request_contact.GSRequestContact.request_contact``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+
+``reset_password``
+------------------
+
+A link to reset a password, sent to an email address that is submitted
+via the *Reset Password* page, when the email address is recognised
+as belonging to a user.
+
+The code for sending the reset password message uses the new subsystem
+for sending a notification (``gs.profile.notify``) but the old system
+of DTML templates.
+
+**Sent to**
+  | The email address of the user that is requesting a password reset.
+
+**via**
+  | ``gs.profile.password.request``
+  | ``gs.profile.notify.notifyuser.NotifyUser``
+
+
+``verify_email_address``
+------------------------
+
+A link to verify an email address, sent to one that has just been
+added to the system, or resent to a known but unverified email address.
+
+**Sent to**
+  | The unverified email address.
+
+**via**
+  | **New User Signs Up via Email**
+  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.register_newUser``
+  | ``Products.GSProfile.utils.send_verification_message``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  |
+  | **New User Signs Up via the Web**
+  | ``gs.profile.signup.request_registration.RequestRegistrationForm.handle_register``
+  | ``gs.profile.signup.request_registration.RequestRegistrationForm.createUser``
+  | ``Products.GSProfile.utils.send_verification_message``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  |
+  | **New User Resends Verification Message**
+  | ``gs.profile.signup.verifywait.VerifyWaitForm.handle_send``
+  | ``gs.profile.signup.verifywait.VerifyWaitForm.actual_handle_send``
+  | ``Products.GSProfile.utils.send_verification_message``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  |
+  | **New User Adds a Different Email Address Instead of Verifying that Originally Entered**
+  | ``gs.profile.signup.verifywait.VerifyWaitForm.handle_send``
+  | ``gs.profile.signup.verifywait.VerifyWaitForm.actual_handle_send``
+  | ``gs.profile.signup.verifywait.VerifyWaitForm.add_new_email``
+  | ``Products.GSProfile.utils.send_verification_message``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  |
+  | **Existing User Adds a New Email Address**
+  | ``Products.GSProfile.email_settings.GSEmailSettings.process_form``
+  | ``Products.GSProfile.email_settings.GSEmailSettings.add_email``
+  | ``Products.GSProfile.email_settings.GSEmailSettings.send_verification``
+  | ``Products.GSProfile.utils.send_verification_message``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  |
+  | **Existing User Resends Verification to an Unverified Address**
+  | ``Products.GSProfile.email_settings.GSEmailSettings.process_form``
+  | ``Products.GSProfile.email_settings.GSEmailSettings.send_verification``
+  | ``Products.GSProfile.utils.send_verification_message``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+Moderation
+----------
+
+Moderation is a world unto its own, and is badly need of a rewrite [#Moderation]_.
+
+``mail_moderated_user``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A message to the group is received from a moderated member.
+
+**Sent to**
+  | The moderated member.
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.processMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+
+``mail_moderator``
+~~~~~~~~~~~~~~~~~~
+
+A message to the group is received from a moderated member.
+
+**Sent to**
+  | The moderators.
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.processMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
+  | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+Email Templates
+===============
+
+Email templates come in two forms. The `digest`_ is a template used
+by the mailing list to send out the topic-digest. The `ListManager`_
+contains the various notifications pertaining to email problems, email
+commands, and the templates for constructing a message to the group.
+
+``digest``
+----------
+
+The ``Templates/email/list`` folder for notifications associated
+with mailing lists. Currently, the digest is the only candidate
+for inclusion here. The ``digest`` is the container for the daily or
+weekly group `topic digest`_. It will be removed once the topic-digest
+is refactored to make it similar to the normal `file-system-side
+notifications`_.
+
+
+**Sent to**
+  | ``All group members who have elected to receive posts in digest form.``
+**via**
+  | **Weekly digest** (sent from all groups)
+  | ``ListManager/process_all_digests.py``
+  | ``Products.XWFMailingListManager.XWFMailingList.manage_digestBoxer``
+  |   ``Products.GSSearch.topicdigestview.TopicDigestView``
+  |   ``Templates.email.list.digest``
+  | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
+  |
+  | **Daily digest** (sent from groups with activity in the last day)
+  | ``ListManager/process_new_digests.py``
+  | ``Products.XWFMailingListManager.XWFMailingList.manage_digestBoxer``
+  |   ``Products.GSSearch.topicdigestview.TopicDigestView``
+  |   ``Templates.email.list.digest``
+  | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
+    
+``ListManager``
+---------------
+
+These notifications live in the ``ListManager`` instance within a
+GroupServer instance.  Some of them are sent via python scripts
+which also live in the ``ListManager``.  As the ``ListManager``
+is an instance of the ``XWFMailingListManager`` class, we
+distinguish the path to these scripts and notifications from
+attributes of the class by using the name ``ListManager`` instead
+of ``Products.XWFMailingListManager``, and using forward-slashes
+(``/``)instead of attribute notation (``.``).
+
+Much of these templates will be removed once we rebuild email
+processing [#RebuildEmail]_.
+
+``email_subscribe_key``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+A subscribe command is received by the group mailing list.
+
+**Sent to**
+  ``The email address from which the command originated``
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_subscribe_key``
+
+
+``email_unsubscribe_key``
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An unsubscribe command is received by the group mailing list from an email 
+address belonging to one of the group members.
+
+**Sent to**
+  ``The email address from which the command originated``
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_unsubscribe_key``
+
+
+``email_event_102``
+~~~~~~~~~~~~~~~~~~~
+
+A group member sends an email that breaches the message size limit to the group.
+
+**Sent to**
+  ``The email address from which the message originated``
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_event_default``
+  | ``ListManager/xwf_email_event``
+
+
+``email_reply``
+~~~~~~~~~~~~~~~
+
+A post is received by the group mailing list from an unregistered email address.
+
+**Sent to**
+  ``The unregistered email address from which the post originated``
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.processMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``ListManager/xwf_email_reply``
+  |
+  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``ListManager/xwf_email_reply``
+  | 
+  | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``ListManager/xwf_email_reply``
+
+
+``email_digest_off``
+~~~~~~~~~~~~~~~~~~~~
+
+A "digest off" command is received by the group mailing list from an email
+address belonging to a group member.
+
+**Sent to**
+  ``The email address from which the command originated``
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.digest_off``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_digest_off``
+  | ``ListManager/xwf_email_digest_off``
+
+
+``email_digest_on``
+~~~~~~~~~~~~~~~~~~~
+
+A "digest on" command is received by the group mailing list from an email
+address belonging to a group member.
+
+**Sent to**
+  ``The email address from which the command originated``
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.digest_on``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_digest_on``
+  | ``ListManager/xwf_email_digest_on``
+
+
+``email_footer``
+~~~~~~~~~~~~~~~~
+
+A post is sent out via email.
+
+**Sent to**
+  ``All group members who have their email delivery settings set to receive one`` 
+  ``post at a time``
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.manage_listboxer``
+  | ``Products.XWFMailingListManager.XWFMailingList.listMail``
+  |   ``Products.XWFMailingListManager.XWFMailingList.mail_footer``
+  |   ``ListManager/xwf_email_footer``
+  | ``Products.XWFMailingListManager.XWFMailingList.sendMail``
+    
+
+``email_header``
+~~~~~~~~~~~~~~~~
+
+A post is sent out via email.
+
+**Sent to**
+  ``All group members who have their email delivery settings set to receive one``
+  ``post at a time``
+
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.manage_listboxer``
+  | ``Products.XWFMailingListManager.XWFMailingList.listMail``
+  |   ``Products.XWFMailingListManager.XWFMailingList.mail_header``
+  |   ``ListManager/xwf_email_header``
+  | ``Products.XWFMailingListManager.XWFMailingList.sendMail``
+
+..  [#RebuildEmail] *Ticket 387: Rebuild Email Processing* is an 
+    important ticket, that summarises the necessary changes for
+    email processing <https://projects.iopen.net/groupserver/ticket/387>
+
+..  [#Moderation] *Ticket 249: Rebuild Moderation* summarises the
+    problems with moderation, and how to fix it
+    <https://projects.iopen.net/groupserver/ticket/249>
+  
+..  _GroupServer.Org: http://groupserver.org/
+..  _OnlineGroups.Net: http://onlinegroups.net/
+..  _Creative Commons Attribution-Share Alike 3.0 New Zealand License:
+    http://creativecommons.org/licenses/by-sa/3.0/nz/
