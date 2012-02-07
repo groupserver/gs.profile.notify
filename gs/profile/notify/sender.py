@@ -24,7 +24,6 @@ class MessageSender(object):
                         fromAddress=None, toAddresses=None):
         msg = self.create_message(subject, txtMessage, htmlMessage, 
                                   fromAddress, toAddresses)
-        print '\nSubject: %s\n' % subject
         notifyUser = NotifyUser(self.toUserInfo.user)
         if not toAddresses:
             toAddresses = self.emailUser.get_delivery_addresses()

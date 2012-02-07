@@ -1,5 +1,6 @@
 # coding=utf-8
 from zope.component import createObject, adapts
+from zope.cachedescriptors.property import Lazy
 from zope.interface import implements
 from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
@@ -16,47 +17,38 @@ class NotifyUser(object):
         self.siteInfo = siteInfo
         if not self.siteInfo:
             self.siteInfo = createObject('groupserver.SiteInfo', user)
-        self.__addresses = self.__emailTemplates = None
-        self.__auditor = self.__mailhost = None
-        self.__emailUser = None
-    
-    @property
-    def emailUser(self):
-        if self.__emailUser == None:
-            userInfo = IGSUserInfo(self.user)
-            self.__emailUser = EmailUser(self.user, userInfo)
-        return self.__emailUser
-    
-    @property
-    def auditor(self):
-        if self.__auditor == None:
-            self.__auditor = Auditor(self.siteInfo, self.user)
-        return self.__auditor
-        
-    @property
-    def addresses(self):
-        if self.__addresses == None:
-            self.__addresses = [e.lower() for e in 
-                                self.emailUser.get_addresses()]
-        return self.__addresses
 
-    @property
+    @Lazy
+    def emailUser(self):
+        userInfo = IGSUserInfo(self.user)
+        retval = EmailUser(self.user, userInfo)
+        return retval
+    
+    @Lazy
+    def auditor(self):
+        retval = Auditor(self.siteInfo, self.user)
+        return retval
+        
+    @Lazy
+    def addresses(self):
+        retval = [e.lower() for e in self.emailUser.get_addresses()]
+        return retval
+
+    @Lazy
     def mailhost(self):
-        if self.__mailhost == None:
-            sr = self.user.site_root()
-            try:
-                self.__mailhost = sr.superValues('Mail Host')[0]
-            except:
-                raise AttributeError, "Can't find a Mail Host object"
-        return self.__mailhost
+        sr = self.user.site_root()
+        try:
+            retval = sr.superValues('Mail Host')[0]
+        except:
+            raise AttributeError, "Can't find a Mail Host object"
+        return retval
         
     @property
     def emailTemplates(self):
-        if self.__emailTemplates == None:
-            sr = self.user.site_root()
-            assert sr
-            self.__emailTemplates = sr.Templates.email.notifications.aq_explicit
-        return self.__emailTemplates
+        sr = self.user.site_root()
+        assert sr
+        retval = sr.Templates.email.notifications.aq_explicit
+        return retval
     
     def get_addresses(self, email_only=()):
         if email_only:
@@ -96,7 +88,7 @@ class NotifyUser(object):
         
         template = (getattr(ptype_templates.aq_explicit, n_id, None) or
                     getattr(ptype_templates.aq_explicit, 'default', None))
-        assert template, 'No template found'
+        assert template, 'No template found for %s/%s' % (n_type, n_id)
         retval = template(self.user, None, to_addr=email_address, 
                             n_id=n_id, n_type=n_type, n_dict=n_dict)
         if isinstance(retval, unicode):
