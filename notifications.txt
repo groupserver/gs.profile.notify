@@ -205,6 +205,49 @@ file-system-side notifications, which use the ``MessageSender`` class.
   |   ``Templates.email.list.digest``
   | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
 
+Cannot Post
+-----------
+
+Sent to a person with a profile when they attempt to post to a group, 
+but disallowed. The content of the message comes from the viewlets that
+make up the ``gs.group.type.*`` eggs. For people people without a 
+profile see `unknown email address`_.
+
+**Sent to**
+  | The a person with a profile that cannot post to the group.
+**URL**
+  | *Group Page* ``/cannot-post.html``
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.checkMail``
+  | ``gs.group.member.canpost.notifier.Notifier``
+  | ``gs.group.member.canpost.notifier.CannotPostMessageSender``
+  | ``gs.profile.notify.notifyuser.NotifyUser``
+
+Unknown Email Address
+---------------------
+
+A post is received by the mailing list from an unregistered email
+address. It is the equivalent of the `cannot post`_ notification for
+anonymous people.
+
+**Sent to**
+  | The unrecognised email address, which sent the original message.
+**URL**
+  | *Group Page* ``/unknown-email.html``
+**via**
+  | ``Products.XWFMailingListManager.XWFMailingList.processMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``gs.group.member.canpost.unknownemail.Notifier``
+  |
+  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``gs.group.member.canpost.unknownemail.Notifier``
+  | 
+  | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``gs.group.member.canpost.unknownemail.Notifier``
+
+
 Notification Templates
 ======================
 
@@ -292,21 +335,6 @@ addresses that the user has added to his or her profile.
 **via**
   | ``Products.XWFMailingListManager.XWFMailingListManager.processBounce``
   | ``Products.CustomUserFolder.CustomUser.send_notification``
-
-
-``cannot_post``
----------------
-
-Sent to a user when they attempt to post to a group, but
-are disallowed. The content of the message comes from the
-``gs.group.member.canpost`` system.
-
-**Sent to**
-  | The member of the group that cannot post.
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.checkMail``
-
 
 ``del_group``
 -------------
@@ -589,29 +617,6 @@ A group member sends an email that breaches the message size limit to the group.
 **via**
   | ``Products.XWFMailingListManager.XWFMailingList.mail_event_default``
   | ``ListManager/xwf_email_event``
-
-
-``email_reply``
-~~~~~~~~~~~~~~~
-
-A post is received by the group mailing list from an unregistered email address.
-
-**Sent to**
-  ``The unregistered email address from which the post originated``
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.processMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
-  | ``ListManager/xwf_email_reply``
-  |
-  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
-  | ``ListManager/xwf_email_reply``
-  | 
-  | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
-  | ``ListManager/xwf_email_reply``
-
 
 ``email_digest_off``
 ~~~~~~~~~~~~~~~~~~~~
