@@ -60,10 +60,10 @@ join the group. It is also used to present the administrator with a
   | ``gs.group.member.invite.inviter.Inviter``
   | ``gs.group.member.invite.notify.InvitationNotifier``
   | ``gs.profile.notify.sender.MessageSender``
-**TODO**
-  | Invite Site Members
-  | Invite CSV
-  | Resend Invitation (Manage Members)
+**TODO** #3478
+  | Invite Site Members #3479
+  | Invite CSV #3480
+  | Resend Invitation (Manage Members) #3481
 
 Group Welcome
 -------------
@@ -84,21 +84,21 @@ Site administrators receive the `New Member`_ notification.
   | ``gs.group.join.join.JoinForm``
   | ``gs.group.join.notify.NotifyNewMember``
   | ``gs.profile.notify.sender.MessageSender``
-**TODO**
-  | A new **invited** member accepts an invitation to join a group
+**TODO** #871
+  | A new **invited** member accepts an invitation to join a group #3473
   | ``gs.profile.invite.initalresponse``
   |
   | An existing **invited** member accepts an invitation to join a 
-    group.
+    group. #3474
   | ``gs.profile.invite.invitationsrespond``
   |
-  | An administrator accepts the *request* to join the group.
+  | An administrator accepts the *request* to join the group. #3475
   | ``gs.group.member.request.request.respond.Respond``
   |
-  | An administrator starts a group, and is made the first member
+  | An administrator starts a group, and is made the first member #3476
   | ``gs.group.start.StartGroupForm``
   |
-  | A new member joins a group during **Sign Up**
+  | A new member joins a group during **Sign Up** #3477
   | ``gs.profile.signup.base.ChangeProfileForm`` or the ``…verifywait.VerifyWaitForm``
 
 New Member
@@ -118,23 +118,22 @@ is the flip-side of the `group welcome`_ notification.
   | ``gs.group.join.notify.NotifyAdmin``
   | ``gs.profile.notify.sender.MessageSender``
 **TODO**
-  | A new **invited** member accepts an invitation to join a group
+  | A new **invited** member accepts an invitation to join a group #3467
   | ``gs.profile.invite.initalresponse``
   |
   | An existing **invited** member accepts an invitation to join a 
-    group.
+    group #3468
   | ``gs.profile.invite.invitationsrespond``
   |
-  | An administrator accepts the *request* to join the group.
+  | An administrator accepts the *request* to join the group. #3469
   | ``gs.group.member.request.request.respond.Respond``
   |
-  | An administrator starts a group, and is made the first member
+  | An administrator starts a group, and is made the first member #3470
   | ``gs.group.start.StartGroupForm``
   |
-  | A new member joins a group during **Sign Up**
+  | A new member joins a group during **Sign Up** #3471
   | ``gs.profile.signup.base.ChangeProfileForm`` or the
     ``…verifywait.VerifyWaitForm``
-
 
 Verify Email Address
 --------------------
@@ -152,14 +151,9 @@ there are *many* places that an email address can be added.
 
   * Sign up (``gs.profile.signup``)
 
-    + Start sign up
-    + Resend verification
-    + New email address
-    
-  * Change email settings (``gs.profile.email.settings``)
-
-    + Add Email Address
-    + Resend Verification
+    + Start sign up #3483 
+    + Resend verification #3484
+    + New email address #3484 (it is sent in two ways)
 
 Request Membership
 ------------------
