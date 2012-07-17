@@ -32,7 +32,16 @@ setup(name='gs.profile.notify',
     zip_safe=True,
     install_requires=[
         'setuptools',
+        'pytz',
+        'zope.cachedescriptors',
+        'zope.component',
+        'zope.i18nmessageid',
+        'zope.interface',
         'gs.profile.email.base',
+        'Products.CustomUserFolder',
+        'Products.GSGroup',
+        'Products.GSAuditTrail',
+        'Products.XWFCore',
         # -*- Extra requirements: -*-
     ],
     entry_points="""

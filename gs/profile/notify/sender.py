@@ -8,7 +8,6 @@ from zope.i18nmessageid import MessageFactory
 from zope.component import createObject
 from zope.cachedescriptors.property import Lazy
 _ = MessageFactory('groupserver')
-from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from gs.profile.email.base.emailuser import EmailUser
 from notifyuser import NotifyUser
@@ -18,7 +17,21 @@ class MessageSender(object):
     def __init__(self, context, toUserInfo):
         self.context = context
         self.toUserInfo = toUserInfo
-        self.emailUser = EmailUser(self.context, self.toUserInfo)
+
+    @Lazy
+    def emailUser(self):
+        assert self.context
+        assert self.toUserInfo
+        retval = EmailUser(self.context, self.toUserInfo)
+        assert retval,  'Could not create the email-user'
+        return retval
+
+    @Lazy
+    def siteInfo(self):
+        assert self.context
+        retval = createObject('groupserver.SiteInfo', self.context)
+        assert retval, 'Could not create the site info'
+        return retval
         
     def send_message(self, subject, txtMessage, htmlMessage='', 
                         fromAddress=None, toAddresses=None):
@@ -56,10 +69,7 @@ class MessageSender(object):
         if address:
             retval = address
         else:
-            siteInfo = createObject('groupserver.SiteInfo', self.context)
-            siteId = siteInfo.id
-            assert siteId, 'Could not get the site ID'
-            retval = get_support_email(self.context, siteId)
+            retval = self.siteInfo.get_support_email()
         return retval
         
     def from_header_from_address(self, address):
@@ -69,11 +79,8 @@ class MessageSender(object):
             userInfo = IGSUserInfo(u)
             retval = formataddr((userInfo.name.encode(utf8), address))
         else:
-            siteInfo = createObject('groupserver.SiteInfo', self.context)
-            siteId = siteInfo.id
-            assert siteId, 'Could not get the site ID'
-            name = siteInfo.name +_(' Support')
-            email = get_support_email(self.context, siteId)
+            name = self.siteInfo.name +_(' Support')
+            email = self.siteInfo.get_support_email()
             retval = formataddr((name.encode(utf8), email))
         assert retval
         return retval
