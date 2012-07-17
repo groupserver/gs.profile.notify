@@ -1,6 +1,5 @@
 # coding=utf-8
 from email.Header import Header
-from Products.XWFCore.XWFUtils import get_support_email
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from gs.profile.email.base.emailuser import EmailUser
 
@@ -53,7 +52,7 @@ class SupportAddressee(object):
         
     @property
     def header(self):
-        email = get_support_email(self.context, self.siteInfo.id)
+        email = self.siteInfo.get_support_email()
         displayName = u'%s Support' % self.siteInfo.name
         retval = addr_hdr_val(displayName, email)
         assert retval
@@ -63,4 +62,3 @@ class SupportAddressee(object):
         retval = str(self.header)
         assert retval
         return retval
-
