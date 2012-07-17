@@ -7,6 +7,7 @@ from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
 from gs.profile.email.base.emailuser import EmailUser
 from interfaces import IGSNotifyUser
 from audit import Auditor, SEND_NOTIFICATION, SEND_MESSAGE
+from gs.email import send_email
 
 class NotifyUser(object):
     implements( IGSNotifyUser )
@@ -34,15 +35,6 @@ class NotifyUser(object):
         retval = [e.lower() for e in self.emailUser.get_addresses()]
         return retval
 
-    @Lazy
-    def mailhost(self):
-        sr = self.user.site_root()
-        try:
-            retval = sr.superValues('Mail Host')[0]
-        except:
-            raise AttributeError, "Can't find a Mail Host object"
-        return retval
-        
     @property
     def emailTemplates(self):
         sr = self.user.site_root()
@@ -75,8 +67,7 @@ class NotifyUser(object):
         if not email_from:
             email_from = get_support_email(self.user, self.siteInfo.id)
         self.auditor.info(SEND_MESSAGE, str(len(message)), email_to)
-        self.mailhost._send(mfrom=email_from, mto=email_to, 
-                            messageText=message)
+        send_email(email_from, email_to, message)
         
     def render_notification(self, n_type, n_id, n_dict, email_address):
         """Generate a notification, returning it as a string."""
