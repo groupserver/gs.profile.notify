@@ -311,8 +311,13 @@ addresses that the user has registered, up to once per day.
   | The member, at their other email addresses.
 
 **via**
-  | ``Products.XWFMailingListManager.processBounce``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  | ``gs.group.email.add.smtp2gs.script``
+  | ``gs.group.email.add.smtp2gs.xverp.handle_bounce``
+  | ``gs.group.email.add.smtp2gs.servercomms.add_bounce``
+  | The entire Zope2 page presentation stack
+  | ``gs.group.member.bounce.handlebounce.HandleBounce.handle_the_jandal``
+  | ``gs.group.member.bounce.handlebounce.HandleBounce.notify_bounce``
+  | ``gs.profile.notify.notifyuser.NotifyUser.send_notification``
 
 
 ``disabled_email``
