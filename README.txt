@@ -150,9 +150,8 @@ The main method used to send a message is::
 The ``MessageSender`` does not, ultimately, send the message. Instead
 it formats the message [#MIME]_, and then calls ``NotifyUser``
 [#NotifyUser]_. The ``send_message`` method of this class sends
-the message on its way by calling the ``_send`` method of the mail
-host. The mail host instance is found using acquisition, and must be
-named ``Mail Host``.
+the message on its way by calling the ``send_email`` function from the
+``gs.email`` component.
 
 Authors
 =======
