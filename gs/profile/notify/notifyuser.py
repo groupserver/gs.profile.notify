@@ -9,6 +9,9 @@ from interfaces import IGSNotifyUser
 from audit import Auditor, SEND_NOTIFICATION, SEND_MESSAGE
 from gs.email import send_email
 
+import logging
+log = logging.getLogger("gs.profile.notify.notifyuser")
+
 class NotifyUser(object):
     implements( IGSNotifyUser )
     adapts( ICustomUser )
@@ -49,7 +52,8 @@ class NotifyUser(object):
         else:
             retval = [e.lower() for e in self.emailUser.get_verified_addresses()]
         assert type(retval) == list
-        assert retval, 'No email addresses to send the notification to.'
+        log.warn('%s has no email addresses to send the notification to.' %
+             self.user.getId())
         return retval
     
     def send_notification(self, n_type, n_id='default', n_dict=None, email_only=()):
