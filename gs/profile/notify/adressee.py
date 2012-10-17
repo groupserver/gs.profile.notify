@@ -3,7 +3,8 @@ from email.Header import Header
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from gs.profile.email.base.emailuser import EmailUser
 
-utf8='utf-8'
+utf8 = 'utf-8'
+
 
 def addr_hdr_val(displayName, addrSpec):
     # --=mpj17=--
@@ -16,9 +17,11 @@ def addr_hdr_val(displayName, addrSpec):
     else:
         # RFC2047: An 'encoded-word' MUST NOT appear within a 'quoted-string'.
         phrase = encodedWord
-    angleAddr = '<%s>' % addrSpec # By itself, an angle address should never appear.
-    nameAddr = '%s %s' % (phrase, angleAddr) # I use a space as the CFWS
+    # By itself, an angle address should never appear.
+    angleAddr = '<%s>' % addrSpec
+    nameAddr = '%s %s' % (phrase, angleAddr)  # I use a space as the CFWS
     return nameAddr
+
 
 class Addressee(object):
     def __init__(self, userInfo, address):
@@ -39,17 +42,19 @@ class Addressee(object):
         retval = str(self.header)
         assert retval
         return retval
-        
+
+
 class AddresseeFromCustomUser(Addressee):
     def __init__(self, customUser, address):
         userInfo = IGSUserInfo(customUser)
         Addressee.__init__(self, userInfo, address)
 
+
 class SupportAddressee(object):
     def __init__(self, context, siteInfo):
         self.siteInfo = siteInfo
         self.context = context
-        
+
     @property
     def header(self):
         email = self.siteInfo.get_support_email()
