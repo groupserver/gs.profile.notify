@@ -27,7 +27,7 @@ setup(name='gs.profile.notify',
     url='http://www.onlinegroups.net/',
     license='other',
     packages=find_packages(exclude=['ez_setup']),
-    namespace_packages=['gs','gs.profile'],
+    namespace_packages=['gs', 'gs.profile'],
     include_package_data=True,
     zip_safe=True,
     install_requires=[
@@ -37,9 +37,9 @@ setup(name='gs.profile.notify',
         'zope.component',
         'zope.i18nmessageid',
         'zope.interface',
+        'gs.email',
         'gs.profile.email.base',
         'Products.CustomUserFolder',
-        'Products.GSGroup',
         'Products.GSAuditTrail',
         'Products.XWFCore',
         # -*- Extra requirements: -*-
@@ -47,4 +47,3 @@ setup(name='gs.profile.notify',
     entry_points="""
     # -*- Entry points: -*-
     """,)
-
