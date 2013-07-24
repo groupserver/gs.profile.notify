@@ -1,4 +1,4 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
 from zope.component import createObject, adapts
 from zope.cachedescriptors.property import Lazy
 from zope.interface import implements
