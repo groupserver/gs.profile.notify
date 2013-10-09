@@ -12,15 +12,16 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from zope.component import createObject, adapts
+from __future__ import absolute_import
 from zope.cachedescriptors.property import Lazy
+from zope.component import createObject, adapts
 from zope.interface import implements
-from Products.XWFCore.XWFUtils import get_support_email
-from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
-from gs.profile.email.base.emailuser import EmailUser
-from interfaces import IGSNotifyUser
-from audit import Auditor, SEND_NOTIFICATION, SEND_MESSAGE
 from gs.email import send_email
+from gs.profile.email.base.emailuser import EmailUser
+from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
+from Products.XWFCore.XWFUtils import get_support_email
+from .interfaces import IGSNotifyUser
+from .audit import Auditor, SEND_NOTIFICATION, SEND_MESSAGE
 
 import logging
 log = logging.getLogger("gs.profile.notify.notifyuser")
