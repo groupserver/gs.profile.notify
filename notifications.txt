@@ -5,7 +5,7 @@ GroupServer Notifications
 :Authors: Alice Murphy; Michael JasonSmith
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
 :Organization: `GroupServer.org`_
-:Date: 2012-01-17
+:Date: 2013-09-05
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
   by `OnlineGroups.Net`_.
@@ -146,7 +146,8 @@ there are *many* places that an email address can be added.
   | The person who has the new address.
 **URL**
   | *Profile page* ``/verification-mesg.html``
-
+**via**
+  | ?
 **TODO**
 
   * Sign up (``gs.profile.signup``)
@@ -187,17 +188,12 @@ file-system-side notifications, which use the ``MessageSender`` class.
 **URL**
   | *Group Page* ``/digest.txt``    
 **via**
-  | ``ListManager/process_all_digests.py``
-  | ``Products.XWFMailingListManager.XWFMailingList.manage_digestBoxer``
-  |   ``Products.GSSearch.topicdigestview.TopicDigestView``
-  |   ``Templates.email.list.digest``
-  | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
-  |
-  | ``ListManager/process_new_digests.py``
-  | ``Products.XWFMailingListManager.XWFMailingList.manage_digestBoxer``
-  |   ``Products.GSSearch.topicdigestview.TopicDigestView``
-  |   ``Templates.email.list.digest``
-  | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
+  | ``gs.group.messages.senddigest.script.main``
+  | ``gs.group.messages.senddigest.script.send_digest``
+  | ``gs.group.messages.topicsdigest.sendDigest.SendAllDigests``
+  | ...
+  |   ``gs.group.messages.topicsdigest.notifiermessages.WeeklyMessage``
+  |   ``gs.group.messages.topicsdigest.notifiermessages.DailyMessage``
 
 Cannot Post
 -----------
@@ -260,12 +256,8 @@ the `Group Welcome`_ notification, which is still used by some old code.
 **via**
   | An administrator creates a new group, and is automatically joined 
     to it.
-  | ``Products.GroupServer.Scripts.forms.start_a_group.start``
-  | ``Products.GroupServer.Scripts.forms.start_a_group.addgroup``
-  | ``Products.GroupServer.Scripts.forms.start_a_group.create.default_administrator``
-  | ``Products.CustomUserFolder.CustomUser.add_groupWithNotification``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-
+  | ``gs.group.start.startgroup.StartGroupForm``
+  | ``gs.group.join.JoiningUser``
 
 ``admin_create_new_user``
 -------------------------

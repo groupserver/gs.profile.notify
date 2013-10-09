@@ -1,4 +1,18 @@
-# coding=utf-8
+# -*- coding: utf-8 -*-
+##############################################################################
+#
+# Copyright © 2013 OnlineGroups.net and Contributors.
+# All Rights Reserved.
+#
+# This software is subject to the provisions of the Zope Public License,
+# Version 2.1 (ZPL).  A copy of the ZPL should accompany this distribution.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND ANY AND ALL EXPRESS OR IMPLIED
+# WARRANTIES ARE DISCLAIMED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
+# FOR A PARTICULAR PURPOSE.
+#
+##############################################################################
+from __future__ import absolute_import
 from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
@@ -7,9 +21,10 @@ from zope.i18nmessageid import MessageFactory
 from zope.component import createObject
 from zope.cachedescriptors.property import Lazy
 _ = MessageFactory('groupserver')
-from Products.CustomUserFolder.interfaces import IGSUserInfo
 from gs.profile.email.base.emailuser import EmailUser
-from notifyuser import NotifyUser
+from Products.CustomUserFolder.interfaces import IGSUserInfo
+from .audit import Auditor, CREATE_MESSAGE
+from .notifyuser import NotifyUser
 utf8 = 'utf-8'
 
 
@@ -46,6 +61,10 @@ class MessageSender(object):
 
     def create_message(self, subject, txtMessage, htmlMessage,
                         fromAddress, toAddresses):
+
+        auditor = Auditor(self.siteInfo, self.toUserInfo)
+        auditor.info(CREATE_MESSAGE, subject)
+
         container = MIMEMultipart('alternative')
         container['Subject'] = str(Header(subject, utf8))
         container['From'] = self.from_header_from_address(fromAddress)
