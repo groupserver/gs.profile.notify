@@ -5,7 +5,7 @@ GroupServer Notifications
 :Authors: Alice Murphy; Michael JasonSmith
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
 :Organization: `GroupServer.org`_
-:Date: 2013-09-05
+:Date: 2013-10-17
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
   by `OnlineGroups.Net`_.
@@ -14,34 +14,29 @@ GroupServer Notifications
    :depth: 2
 
 Notifications are small messages that are sent to the user outside the
-group-email context. They include messages such as the `invitation`_
-to join a group, and the `group welcome`_ email. In this document we
-describe the various notifications sent by GroupServer. We summarise
-who they are sent to, and the code-path that is followed to send
-the notification.
+group-email context. They include messages such as the `invitation`_ to
+join a group, and the `group welcome`_ email. In this document we describe
+the various notifications sent by GroupServer. We summarise who they are
+sent to, and the code-path that is followed to send the notification.
 
 Currently the notifications are being transitioned to their third
-version. These `file-system-side notifications`_ are are more flexible
-than the old `notification templates`_. The notifications in different
-sub-systems will be converted to file-system side notifications when
-each module is reviewed in the normal process of software maintenance
-and refactoring.
+version. These `file-system-side notifications`_ are are more flexible than
+the old `notification templates`_. The notifications in different
+sub-systems will be converted to file-system side notifications when each
+module is reviewed in the normal process of software maintenance and
+refactoring.
 
-Finally, we end with a review of the `email templates`_ that are
-used for sending email messages, and as responses to commands that
-are sent by email.
+Finally, we end with a review of the ListManager_ that sends email
+messages, and as responses to commands that are sent by email.
 
 File-System-Side Notifications
 ==============================
 
-There are not yet many notifications in the file system, but this is
-the direction in which we are heading. As we rebuild each subsystem,
-we will move its notifications to the file system.
-
-The file-system-side notifications work like Web pages. The
-notification system renders two pages — an HTML page and a
-plain-text version of the same message — and places them in an
-email message. All of the new fine-system-side notifications use
+As we rebuild each subsystem, we move its notifications to the file system,
+from the ZMI. The file-system-side notifications work like Web pages. The
+notification system renders two pages — an HTML page and a plain-text
+version of the same message — and places them in an email message. All of
+the new fine-system-side notifications use
 ``gs.profile.notify.sender.MessageSender`` to send the message.
 
 Invitation
@@ -51,55 +46,63 @@ An invitation is a message from an administrator asking someone to
 join the group. It is also used to present the administrator with a
 *preview* of the invitation.
 
-**Sent to**
-  | Someone who has been invited to join a group by the administrator.
-**URL**
-  | *Group page* ``/invitationmessage.html``
-**via**
+:Sent to: Someone who has been invited to join a group by the administrator.
+:URL: *Group page* ``/invitationmessage.html``
+:via: Clicking *Invite*
+
   | ``gs.group.member.invite.invite.InviteEditProfileForm``
   | ``gs.group.member.invite.inviter.Inviter``
   | ``gs.group.member.invite.notify.InvitationNotifier``
   | ``gs.profile.notify.sender.MessageSender``
-**TODO** #3478
-  | Invite Site Members #3479
-  | Invite CSV #3480
-  | Resend Invitation (Manage Members) #3481
+  |
+  | Invite site member: ``gs.group.member.invite.invitesitemembers.GSInviteSiteMembersForm``
+
+:TODO (`3478`_): Invite CSV #3480 and Resend Invitation (Manage Members) #3481
+
+.. _3478: https://redmine.iopen.net/issues/3478
 
 Group Welcome
 -------------
 
-The *Group Welcome* notification is sent to a new member when he or
-she joins a group. However, there are many ways of becoming a member,
-and some still use the old code, rather than this shiny method (see
-`add_group`_ below).
+The *Group Welcome* notification is sent to a new member when he or she
+joins a group. However, there are many ways of becoming a member, and some
+still use the old code, rather than this shiny method.
 
 Site administrators receive the `New Member`_ notification.
 
-**Sent to**
-  | A new member of a group.
-**URL**
-  | *Group page* ``/new-member-msg.html``
-**via**
-  | A *logged in member* clicks ``Join`` in a Public group.
+:Sent to: A new member of a group.
+:URL: *Group page* ``/new-member-msg.html``
+:via: A *logged in member* clicks ``Join`` in a Public group.
+
   | ``gs.group.join.join.JoinForm``
   | ``gs.group.join.notify.NotifyNewMember``
   | ``gs.profile.notify.sender.MessageSender``
-**TODO** #871
-  | A new **invited** member accepts an invitation to join a group #3473
+  |
+  | A new **invited** member accepts an invitation to join a group
   | ``gs.profile.invite.initalresponse``
   |
-  | An existing **invited** member accepts an invitation to join a 
-    group. #3474
+  | An existing **invited** member accepts an invitation to join a group.
   | ``gs.profile.invite.invitationsrespond``
-  |
-  | An administrator accepts the *request* to join the group. #3475
-  | ``gs.group.member.request.request.respond.Respond``
-  |
-  | An administrator starts a group, and is made the first member #3476
-  | ``gs.group.start.StartGroupForm``
-  |
-  | A new member joins a group during **Sign Up** #3477
-  | ``gs.profile.signup.base.ChangeProfileForm`` or the ``…verifywait.VerifyWaitForm``
+
+:TODO (3477_): A new member joins a group during **Sign Up** 
+  ``gs.profile.signup.base.ChangeProfileForm`` or the
+  ``…verifywait.VerifyWaitForm``
+
+.. _3477: https://redmine.iopen.net/issues/3477
+
+Group Started
+-------------
+
+Information about the group that has just been started
+
+:Sent to: Every site administrator.
+:URL: *Group page* ``/gs-group-start.html``
+:via: A *site administrator* clicks ``Start``
+
+  | ``gs.group.start.startgroup.StartGroupForm``
+  | ``gs.group.start.notify.StartNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
 
 New Member
 ----------
@@ -107,33 +110,32 @@ New Member
 Sent to the group administrators when a new member joins the group. It
 is the flip-side of the `group welcome`_ notification.
 
-**Sent to**
-  | The group administrators, or the site administrators if there are 
-  | no group administrators.
-**URL**
-  | *Group page* ``/new-member-admin-msg.html``
-**via**
-  | A *logged in member* clicks ``Join`` in a Public group.
+:Sent to: The group administrators, or the site administrators if there are
+          no group administrators.
+
+:URL: *Group page* ``/new-member-admin-msg.html``
+
+:via: A *logged in member* clicks ``Join`` in a Public group.
+
   | ``gs.group.join.join.JoinForm``
   | ``gs.group.join.notify.NotifyAdmin``
   | ``gs.profile.notify.sender.MessageSender``
-**TODO**
-  | A new **invited** member accepts an invitation to join a group #3467
+  |
+  | A new **invited** member accepts an invitation to join a group
   | ``gs.profile.invite.initalresponse``
   |
   | An existing **invited** member accepts an invitation to join a 
-    group #3468
+    group
   | ``gs.profile.invite.invitationsrespond``
   |
   | An administrator accepts the *request* to join the group. #3469
   | ``gs.group.member.request.request.respond.Respond``
-  |
-  | An administrator starts a group, and is made the first member #3470
-  | ``gs.group.start.StartGroupForm``
-  |
-  | A new member joins a group during **Sign Up** #3471
-  | ``gs.profile.signup.base.ChangeProfileForm`` or the
-    ``…verifywait.VerifyWaitForm``
+
+:TODO (3471_): A new member joins a group during **Sign Up**
+   ``gs.profile.signup.base.ChangeProfileForm`` or the
+   ``…verifywait.VerifyWaitForm``
+
+.. _3471: https://redmine.iopen.net/issues/3471
 
 Verify Email Address
 --------------------
@@ -148,13 +150,14 @@ there are *many* places that an email address can be added.
   | *Profile page* ``/verification-mesg.html``
 **via**
   | ?
-**TODO**
 
+:TODO (3482_):
   * Sign up (``gs.profile.signup``)
 
     + Start sign up #3483 
     + Resend verification #3484
-    + New email address #3484 (it is sent in two ways)
+
+.. _3482: https://redmine.iopen.net/issues/3482
 
 Request Membership
 ------------------
@@ -163,12 +166,10 @@ This message is sent when someone requests to become a member of a
 Private group. It is the opposite of a `invitation`_. It should not
 be confused with `request_contact`_.
 
-**Sent to**
-  | The administrator of the group.
-**URL**
-  | *Group page* ``/request_message.html``
-**via**
-  | ``gs.group.member.request.request.RequestForm``
+:Sent to: The administrator of the group.
+:URL: *Group page* ``/request_message.html``
+:via: The request membership form
+  | ``gs.group.member.request.request.Request Form``
   | ``gs.profile.notify.sender.MessageSender``
   
 Topic Digest
@@ -183,11 +184,9 @@ was partly an experiment in how to create such a system. As
 such, it requires a rewrite to bring it into line with the other
 file-system-side notifications, which use the ``MessageSender`` class.
 
-**Sent to**
-  | All group members who have elected to receive posts in digest form.
-**URL**
-  | *Group Page* ``/digest.txt``    
-**via**
+:Sent to: All group members who have elected to receive posts in digest form.
+:URL: *Group Page* ``/digest.txt``    
+:via:
   | ``gs.group.messages.senddigest.script.main``
   | ``gs.group.messages.senddigest.script.send_digest``
   | ``gs.group.messages.topicsdigest.sendDigest.SendAllDigests``
@@ -203,11 +202,9 @@ but disallowed. The content of the message comes from the viewlets that
 make up the ``gs.group.type.*`` eggs. For people people without a 
 profile see `unknown email address`_.
 
-**Sent to**
-  | The a person with a profile that cannot post to the group.
-**URL**
-  | *Group Page* ``/cannot-post.html``
-**via**
+:Sent to: The a person with a profile that cannot post to the group.
+:URL: *Group Page* ``/cannot-post.html``
+:via:
   | ``Products.XWFMailingListManager.XWFMailingList.checkMail``
   | ``gs.group.member.canpost.notifier.Notifier``
   | ``gs.group.member.canpost.notifier.CannotPostMessageSender``
@@ -220,11 +217,9 @@ A post is received by the mailing list from an unregistered email
 address. It is the equivalent of the `cannot post`_ notification for
 anonymous people.
 
-**Sent to**
-  | The unrecognised email address, which sent the original message.
-**URL**
-  | *Group Page* ``/unknown-email.html``
-**via**
+:Sent to: The unrecognised email address, which sent the original message.
+:URL: *Group Page* ``/unknown-email.html``
+:via:
   | ``Products.XWFMailingListManager.XWFMailingList.processMail``
   | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
   | ``gs.group.member.canpost.unknownemail.Notifier``
@@ -241,23 +236,9 @@ anonymous people.
 Notification Templates
 ======================
 
-These are the old notifications. They are DTML templates : this is the folder in which 
-``Products.CustomUserFolder.Customuser.send_notification`` looks to find the 
-notifications passed to it by ID.
-
-``add_group``
--------------
-
-Sent to a group member upon joining a group. This is the old version of
-the `Group Welcome`_ notification, which is still used by some old code.
-
-**Sent to**
-  | The new group member.
-**via**
-  | An administrator creates a new group, and is automatically joined 
-    to it.
-  | ``gs.group.start.startgroup.StartGroupForm``
-  | ``gs.group.join.JoiningUser``
+These are the old notifications. They are DTML templates: this is the
+folder in which ``Products.CustomUserFolder.Customuser.send_notification``
+looks to find the notifications passed to it by ID.
 
 ``admin_create_new_user``
 -------------------------
@@ -272,24 +253,7 @@ new `invitation`_ notification.
   | A newly created user and prospective member.
 
 **via**
-  | ``...``
-  | (The Invitations system is currently undergoing changes. This information 
-  |  will be added once the new page is deployed.)
-
-``admin_create_new_user_rejected``
-----------------------------------
-
-Sent to all administrators of a group when an invitation to join the
-group is **declined.**
-
-**Sent to**
-  | All administrators of the group.
-
-**via**
-  | ``...``
-  | (The Invitations system is currently undergoing changes. This information 
-  |  will be added once the new page is deployed.)
-
+  | The Invite by CSV code.
 
 ``bounce_detection``
 --------------------
@@ -336,12 +300,6 @@ Sent to a member when they leave a group.
   | The former member of the group, that has just left.
 
 **via**
-  | An **unsubscribe** confirmation is received by the group mailing list 
-    from an email address belonging to a group member.
-  | ``Products.XWFMailingListManager.XWFMailingList.manage_delMember``
-  | ``Products.CustomUserFolder.CustomUser.del_groupWithNotification``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-  |
   | A logged in member clicks ``Leave`` on the groups page or a group 
     homepage.
   | ``Products.GroupServer.Scripts.set.subscribe_group``
@@ -352,34 +310,6 @@ Sent to a member when they leave a group.
   | ``...``
   |  (The Manage Members page is currently undergoing changes. This information 
   |   will be added once the new page is deployed.)
-
-
-``invite_join_group_accepted``
-------------------------------
-
-The existing user who was invited to a group accepts the invitation.
-
-**Sent to**
-  | The administrator who sent the invitation.
-
-**via**
-  | ``...``
-  | (The Invitations system is currently undergoing changes. 
-    This information will be added once the new page is deployed.)
-
-
-``invite_join_group_declined``
-------------------------------
-
-The existing user who was invited to a group declines the invitation.
-
-**Sent to**
-  | The administrator who sent the invitation.
-
-**via**
-  | ``...``
-  | (The Invitations system is currently undergoing changes. This
-    information will be added once the new page is deployed.)
 
 
 ``leave_group_admin``
@@ -519,44 +449,9 @@ A message to the group is received from a moderated member.
   | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
   | ``Products.CustomUserFolder.CustomUser.send_notification``
 
-Email Templates
-===============
-
-Email templates come in two forms. The `digest`_ is a template used
-by the mailing list to send out the topic-digest. The `ListManager`_
-contains the various notifications pertaining to email problems, email
-commands, and the templates for constructing a message to the group.
-
-``digest``
-----------
-
-The ``Templates/email/list`` folder for notifications associated
-with mailing lists. Currently, the digest is the only candidate
-for inclusion here. The ``digest`` is the container for the daily or
-weekly group `topic digest`_. It will be removed once the topic-digest
-is refactored to make it similar to the normal `file-system-side
-notifications`_.
-
-
-**Sent to**
-  | ``All group members who have elected to receive posts in digest form.``
-**via**
-  | **Weekly digest** (sent from all groups)
-  | ``ListManager/process_all_digests.py``
-  | ``Products.XWFMailingListManager.XWFMailingList.manage_digestBoxer``
-  |   ``Products.GSSearch.topicdigestview.TopicDigestView``
-  |   ``Templates.email.list.digest``
-  | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
-  |
-  | **Daily digest** (sent from groups with activity in the last day)
-  | ``ListManager/process_new_digests.py``
-  | ``Products.XWFMailingListManager.XWFMailingList.manage_digestBoxer``
-  |   ``Products.GSSearch.topicdigestview.TopicDigestView``
-  |   ``Templates.email.list.digest``
-  | ``Products.XWFMailingListManager.XWFMailingList.send_digest``
-    
+   
 ``ListManager``
----------------
+===============
 
 These notifications live in the ``ListManager`` instance within a
 GroupServer instance.  Some of them are sent via python scripts
@@ -571,7 +466,7 @@ Much of these templates will be removed once we rebuild email
 processing [#RebuildEmail]_.
 
 ``email_subscribe_key``
-~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------
 
 A subscribe command is received by the group mailing list.
 
@@ -584,7 +479,7 @@ A subscribe command is received by the group mailing list.
 
 
 ``email_unsubscribe_key``
-~~~~~~~~~~~~~~~~~~~~~~~~~
+-------------------------
 
 An unsubscribe command is received by the group mailing list from an email 
 address belonging to one of the group members.
@@ -598,7 +493,7 @@ address belonging to one of the group members.
 
 
 ``email_event_102``
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 A group member sends an email that breaches the message size limit to the group.
 
@@ -610,7 +505,7 @@ A group member sends an email that breaches the message size limit to the group.
   | ``ListManager/xwf_email_event``
 
 ``email_digest_off``
-~~~~~~~~~~~~~~~~~~~~
+--------------------
 
 A "digest off" command is received by the group mailing list from an email
 address belonging to a group member.
@@ -626,7 +521,7 @@ address belonging to a group member.
 
 
 ``email_digest_on``
-~~~~~~~~~~~~~~~~~~~
+-------------------
 
 A "digest on" command is received by the group mailing list from an email
 address belonging to a group member.
@@ -642,7 +537,7 @@ address belonging to a group member.
 
 
 ``email_footer``
-~~~~~~~~~~~~~~~~
+----------------
 
 A post is sent out via email.
 
@@ -659,7 +554,7 @@ A post is sent out via email.
     
 
 ``email_header``
-~~~~~~~~~~~~~~~~
+----------------
 
 A post is sent out via email.
 
