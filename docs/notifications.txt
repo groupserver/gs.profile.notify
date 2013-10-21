@@ -83,10 +83,10 @@ Site administrators receive the `New Member`_ notification.
   |
   | An existing **invited** member accepts an invitation to join a group.
   | ``gs.profile.invite.invitationsrespond``
-
-:TODO (3477_): A new member joins a group during **Sign Up** 
-  ``gs.profile.signup.base.ChangeProfileForm`` or the
-  ``…verifywait.VerifyWaitForm``
+  |
+  | A new member joins a group during **registration** 
+  | ``gs.profile.signup.base.changeprofile.ChangeProfileForm``  
+  | *or* ``gs.profile.signup.base.verifywait.VerifyWaitForm``
 
 .. _3477: https://redmine.iopen.net/issues/3477
 
@@ -112,9 +112,7 @@ is the flip-side of the `group welcome`_ notification.
 
 :Sent to: The group administrators, or the site administrators if there are
           no group administrators.
-
 :URL: *Group page* ``/new-member-admin-msg.html``
-
 :via: A *logged in member* clicks ``Join`` in a Public group.
 
   | ``gs.group.join.join.JoinForm``
@@ -130,34 +128,37 @@ is the flip-side of the `group welcome`_ notification.
   |
   | An administrator accepts the *request* to join the group. #3469
   | ``gs.group.member.request.request.respond.Respond``
-
-:TODO (3471_): A new member joins a group during **Sign Up**
-   ``gs.profile.signup.base.ChangeProfileForm`` or the
-   ``…verifywait.VerifyWaitForm``
-
-.. _3471: https://redmine.iopen.net/issues/3471
+  |
+  | A new member joins a group during **registration**
+  | ``gs.profile.signup.base.changeprofile.ChangeProfileForm`` 
+  | *or* ``gs.profile.signup.base.verifywait.VerifyWaitForm``
 
 Verify Email Address
 --------------------
 
-Email addresses must be verified. The verification message is sent
-from everywhere that email addresses can be added. It turns out that
-there are *many* places that an email address can be added.
+Email addresses must be verified. The verification message is sent from
+everywhere that email addresses can be added. It turns out that there are
+*many* places that an email address can be added. The method
+``gs.profile.email.verify.emailverificationuser.EmailVerificationUser.send_verification``
+sends the verification message for all higher-level code.
 
-**Sent to**
-  | The person who has the new address.
-**URL**
-  | *Profile page* ``/verification-mesg.html``
-**via**
-  | ?
+:Sent to: The person who has the new address.
+:URL: *Profile page* ``/verification-mesg.html``
+:via: Anywhere that lets the user add an email address
 
-:TODO (3482_):
-  * Sign up (``gs.profile.signup``)
+  | Registering as a new user (or requesting membership as a new user)
+  | ``gs.profile.signup.base.request_registration.RequestRegistrationForm``
+  | ``gs.profile.email.verify.emailverificationuser.EmailVerificationUser``
+  | ``gs.profile.email.verify.notify.Notifier``
+  | ``gs.profile.notify.sender.MessageSender``
+  |
+  | Adding a new email address, or sending another verification message
+    during registration
+  | ``gs.profile.signup.base.verifywait.VerifyWaitForm``
+  |
+  | Adding a new email address
+  | ``gs.profile.email.settings.settings.ChangeEmailSettingsForm``
 
-    + Start sign up #3483 
-    + Resend verification #3484
-
-.. _3482: https://redmine.iopen.net/issues/3482
 
 Request Membership
 ------------------
@@ -368,54 +369,6 @@ of DTML templates.
   | ``gs.profile.password.request``
   | ``gs.profile.notify.notifyuser.NotifyUser``
 
-
-``verify_email_address``
-------------------------
-
-A link to verify an email address, sent to one that has just been
-added to the system, or resent to a known but unverified email address.
-
-**Sent to**
-  | The unverified email address.
-
-**via**
-  | **New User Signs Up via Email**
-  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.register_newUser``
-  | ``Products.GSProfile.utils.send_verification_message``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-  |
-  | **New User Signs Up via the Web**
-  | ``gs.profile.signup.request_registration.RequestRegistrationForm.handle_register``
-  | ``gs.profile.signup.request_registration.RequestRegistrationForm.createUser``
-  | ``Products.GSProfile.utils.send_verification_message``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-  |
-  | **New User Resends Verification Message**
-  | ``gs.profile.signup.verifywait.VerifyWaitForm.handle_send``
-  | ``gs.profile.signup.verifywait.VerifyWaitForm.actual_handle_send``
-  | ``Products.GSProfile.utils.send_verification_message``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-  |
-  | **New User Adds a Different Email Address Instead of Verifying that Originally Entered**
-  | ``gs.profile.signup.verifywait.VerifyWaitForm.handle_send``
-  | ``gs.profile.signup.verifywait.VerifyWaitForm.actual_handle_send``
-  | ``gs.profile.signup.verifywait.VerifyWaitForm.add_new_email``
-  | ``Products.GSProfile.utils.send_verification_message``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-  |
-  | **Existing User Adds a New Email Address**
-  | ``Products.GSProfile.email_settings.GSEmailSettings.process_form``
-  | ``Products.GSProfile.email_settings.GSEmailSettings.add_email``
-  | ``Products.GSProfile.email_settings.GSEmailSettings.send_verification``
-  | ``Products.GSProfile.utils.send_verification_message``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-  |
-  | **Existing User Resends Verification to an Unverified Address**
-  | ``Products.GSProfile.email_settings.GSEmailSettings.process_form``
-  | ``Products.GSProfile.email_settings.GSEmailSettings.send_verification``
-  | ``Products.GSProfile.utils.send_verification_message``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
 
 Moderation
 ----------
