@@ -5,7 +5,7 @@ GroupServer Notifications
 :Authors: Alice Murphy; Michael JasonSmith
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
 :Organization: `GroupServer.org`_
-:Date: 2013-10-17
+:Date: 2014-01-29
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
   by `OnlineGroups.Net`_.
@@ -50,14 +50,23 @@ join the group. It is also used to present the administrator with a
 :URL: *Group page* ``/invitationmessage.html``
 :via: Clicking *Invite*
 
-  | ``gs.group.member.invite.invite.InviteEditProfileForm``
-  | ``gs.group.member.invite.inviter.Inviter``
-  | ``gs.group.member.invite.notify.InvitationNotifier``
+  | ``gs.group.member.invite.base.invite.InviteEditProfileForm``
+  | ``gs.group.member.invite.base.processor.InviteProcessor``
+  | ``gs.group.member.invite.base.inviter.Inviter``
+  | ``gs.group.member.invite.base.notify.InvitationNotifier``
   | ``gs.profile.notify.sender.MessageSender``
   |
   | Invite site member: ``gs.group.member.invite.invitesitemembers.GSInviteSiteMembersForm``
+  | ``gs.group.member.invite.json.api.InviteUserAPI``
+  | ``gs.group.member.invite.base.processor.InviteProcessor``
+  | ...
+  |
+  | Invite in bulk: ``gs.group.member.invite.csv.ui.CSVUploadUI``
+  | ``gs.group.member.invite.json.api.InviteUserAPI``
+  | ``gs.group.member.invite.base.processor.InviteProcessor``
+  | ...
 
-:TODO (`3478`_): Invite CSV #3480 and Resend Invitation (Manage Members) #3481
+:TODO (`3478`_): Resend Invitation (Manage Members) #3481
 
 .. _3478: https://redmine.iopen.net/issues/3478
 
@@ -88,8 +97,6 @@ Site administrators receive the `New Member`_ notification.
   | ``gs.profile.signup.base.changeprofile.ChangeProfileForm``  
   | *or* ``gs.profile.signup.base.verifywait.VerifyWaitForm``
 
-.. _3477: https://redmine.iopen.net/issues/3477
-
 Group Started
 -------------
 
@@ -102,7 +109,6 @@ Information about the group that has just been started
   | ``gs.group.start.startgroup.StartGroupForm``
   | ``gs.group.start.notify.StartNotifier``
   | ``gs.profile.notify.sender.MessageSender``
-
 
 New Member
 ----------
@@ -158,7 +164,6 @@ sends the verification message for all higher-level code.
   |
   | Adding a new email address
   | ``gs.profile.email.settings.settings.ChangeEmailSettingsForm``
-
 
 Request Membership
 ------------------
@@ -233,6 +238,23 @@ anonymous people.
   | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
   | ``gs.group.member.canpost.unknownemail.Notifier``
 
+Reset password
+--------------
+
+A link to reset a password, sent to an email address that is submitted
+via the *Reset Password* page, when the email address is recognised
+as belonging to a user.
+
+:Sent to: The person that requested the password reset.
+:URL: None (see note below).
+:via:
+   | ``gs,profile.password.request.RequestPasswordResetForm``
+   | ``gs.profile.notify.notifyuser.NotifyUser.send_message``
+
+:Note: While the reset password message *is* stored on the file-system, it
+       is constructed in a unique way by the
+       ``.createresetmessage.create_reset_message`` function, rather than
+       by a page.
 
 Notification Templates
 ======================
@@ -240,21 +262,6 @@ Notification Templates
 These are the old notifications. They are DTML templates: this is the
 folder in which ``Products.CustomUserFolder.Customuser.send_notification``
 looks to find the notifications passed to it by ID.
-
-``admin_create_new_user``
--------------------------
-
-The **invitation** to join a group that is sent to a new user when
-the user is created upon being invited. It contains one link to accept
-the invitation, and another to decline. If the invitation is declined,
-then the user object is destroyed. It is now being replaced with the
-new `invitation`_ notification.
-
-**Sent to**
-  | A newly created user and prospective member.
-
-**via**
-  | The Invite by CSV code.
 
 ``bounce_detection``
 --------------------
@@ -276,7 +283,6 @@ addresses that the user has registered, up to once per day.
   | ``gs.group.member.bounce.handlebounce.HandleBounce.notify_bounce``
   | ``gs.profile.notify.notifyuser.NotifyUser.send_notification``
 
-
 ``disabled_email``
 ------------------
 
@@ -289,8 +295,13 @@ addresses that the user has added to his or her profile.
   | The member, at their other email addresses.
 
 **via**
-  | ``Products.XWFMailingListManager.XWFMailingListManager.processBounce``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
+  | ``gs.group.email.add.smtp2gs.script``
+  | ``gs.group.email.add.smtp2gs.xverp.handle_bounce``
+  | ``gs.group.email.add.smtp2gs.servercomms.add_bounce``
+  | The entire Zope2 page presentation stack
+  | ``gs.group.member.bounce.handlebounce.HandleBounce.handle_the_jandal``
+  | ``gs.group.member.bounce.handlebounce.HandleBounce.notify_disabled``
+  | ``gs.profile.notify.notifyuser.NotifyUser.send_notification``
 
 ``del_group``
 -------------
@@ -311,7 +322,6 @@ Sent to a member when they leave a group.
   | ``...``
   |  (The Manage Members page is currently undergoing changes. This information 
   |   will be added once the new page is deployed.)
-
 
 ``leave_group_admin``
 ---------------------
@@ -337,7 +347,6 @@ left the group.
   | ``Products.CustomUserFolder.CustomUser.add_groupWithNotification``
   | ``Products.CustomUserFolder.CustomUser.send_notification``
 
-
 ``request_contact``
 -------------------
 
@@ -349,26 +358,6 @@ A user requests contact with another.
 **via**
   | ``Products.GSProfile.request_contact.GSRequestContact.request_contact``
   | ``Products.CustomUserFolder.CustomUser.send_notification``
-
-
-``reset_password``
-------------------
-
-A link to reset a password, sent to an email address that is submitted
-via the *Reset Password* page, when the email address is recognised
-as belonging to a user.
-
-The code for sending the reset password message uses the new subsystem
-for sending a notification (``gs.profile.notify``) but the old system
-of DTML templates.
-
-**Sent to**
-  | The email address of the user that is requesting a password reset.
-
-**via**
-  | ``gs.profile.password.request``
-  | ``gs.profile.notify.notifyuser.NotifyUser``
-
 
 Moderation
 ----------
@@ -429,20 +418,6 @@ A subscribe command is received by the group mailing list.
 **via**
   | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
   | ``Products.XWFMailingListManager.XWFMailingList.mail_subscribe_key``
-
-
-``email_unsubscribe_key``
--------------------------
-
-An unsubscribe command is received by the group mailing list from an email 
-address belonging to one of the group members.
-
-**Sent to**
-  ``The email address from which the command originated``
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_unsubscribe_key``
 
 
 ``email_event_102``
