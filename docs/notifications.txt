@@ -271,10 +271,9 @@ is not accepting email that GroupServer attempts to deliver (the
 address is "bouncing"). The notification is sent to all *other*
 addresses that the user has registered, up to once per day.
 
-**Sent to**
-  | The member, at their other email addresses.
+:Sent to: The member, at their other email addresses.
 
-**via**
+:via:
   | ``gs.group.email.add.smtp2gs.script``
   | ``gs.group.email.add.smtp2gs.xverp.handle_bounce``
   | ``gs.group.email.add.smtp2gs.servercomms.add_bounce``
@@ -282,6 +281,10 @@ addresses that the user has registered, up to once per day.
   | ``gs.group.member.bounce.handlebounce.HandleBounce.handle_the_jandal``
   | ``gs.group.member.bounce.handlebounce.HandleBounce.notify_bounce``
   | ``gs.profile.notify.notifyuser.NotifyUser.send_notification``
+
+:See also: `Feature 4065`_
+
+.. _Feature 4065: https://redmine.iopen.net/issues/4065
 
 ``disabled_email``
 ------------------
@@ -291,10 +294,9 @@ has refused to accept email from GroupServer for five or more unique
 days out of the last 60. The notification is sent to all other
 addresses that the user has added to his or her profile.
 
-**Sent to**
-  | The member, at their other email addresses.
+:Sent to: The member, at their other email addresses.
 
-**via**
+:via:
   | ``gs.group.email.add.smtp2gs.script``
   | ``gs.group.email.add.smtp2gs.xverp.handle_bounce``
   | ``gs.group.email.add.smtp2gs.servercomms.add_bounce``
@@ -303,15 +305,18 @@ addresses that the user has added to his or her profile.
   | ``gs.group.member.bounce.handlebounce.HandleBounce.notify_disabled``
   | ``gs.profile.notify.notifyuser.NotifyUser.send_notification``
 
+:See also: `Feature 4066`_
+
+.. _Feature 4066: https://redmine.iopen.net/issues/4066
+
 ``del_group``
 -------------
 
 Sent to a member when they leave a group.
 
-**Sent to**
-  | The former member of the group, that has just left.
+:Sent to: The former member of the group, that has just left.
 
-**via**
+:via:
   | A logged in member clicks ``Leave`` on the groups page or a group 
     homepage.
   | ``Products.GroupServer.Scripts.set.subscribe_group``
@@ -323,16 +328,19 @@ Sent to a member when they leave a group.
   |  (The Manage Members page is currently undergoing changes. This information 
   |   will be added once the new page is deployed.)
 
+:See also: `Feature 4062`_
+
+.. _Feature 4062: https://redmine.iopen.net/issues/4062
+
 ``leave_group_admin``
 ---------------------
 
 Notify the administrators and the participation coach that a member has 
 left the group.
 
-**Sent to**
-  | The participation coach.
+:Sent to: The participation coach.
 
-**via**
+:via:
   | A logged in **member** clicks ``Leave`` on the groups index page or 
     the group homepage.
   | ``Products.GroupServer.Scripts.set.subscribe_group``
@@ -347,22 +355,30 @@ left the group.
   | ``Products.CustomUserFolder.CustomUser.add_groupWithNotification``
   | ``Products.CustomUserFolder.CustomUser.send_notification``
 
+:See also: `Feature 4063`_
+
+.. _Feature 4063: https://redmine.iopen.net/issues/4063
+
 ``request_contact``
 -------------------
 
 A user requests contact with another.
 
-**Sent to**
-  | The member that is being petitioned for contact.
+:Sent to: The member that is being petitioned for contact.
 
-**via**
+:via:
   | ``Products.GSProfile.request_contact.GSRequestContact.request_contact``
   | ``Products.CustomUserFolder.CustomUser.send_notification``
+
+:See also: `Feature 3409`_
+
+.. _Feature 3409: https://redmine.iopen.net/issues/3409
 
 Moderation
 ----------
 
-Moderation is a world unto its own, and is badly need of a rewrite [#Moderation]_.
+Moderation is a world unto its own, and is badly need of a rewrite
+[#Moderation]_.
 
 ``mail_moderated_user``
 ~~~~~~~~~~~~~~~~~~~~~~~
