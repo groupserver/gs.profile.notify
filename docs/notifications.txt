@@ -39,6 +39,22 @@ version of the same message — and places them in an email message. All of
 the new fine-system-side notifications use
 ``gs.profile.notify.sender.MessageSender`` to send the message.
 
+Cannot Post
+-----------
+
+Sent to a person with a profile when they attempt to post to a group, 
+but disallowed. The content of the message comes from the viewlets that
+make up the ``gs.group.type.*`` eggs. For people people without a 
+profile see `unknown email address`_.
+
+:Sent to: The a person with a profile that cannot post to the group.
+:URL: *Group Page* ``/cannot-post.html``
+:via:
+  | ``Products.XWFMailingListManager.XWFMailingList.checkMail``
+  | ``gs.group.member.canpost.notifier.Notifier``
+  | ``gs.group.member.canpost.notifier.CannotPostMessageSender``
+  | ``gs.profile.notify.notifyuser.NotifyUser``
+
 Invitation
 ----------
 
@@ -139,6 +155,81 @@ is the flip-side of the `group welcome`_ notification.
   | ``gs.profile.signup.base.changeprofile.ChangeProfileForm`` 
   | *or* ``gs.profile.signup.base.verifywait.VerifyWaitForm``
 
+Request Membership
+------------------
+
+This message is sent when someone requests to become a member of a
+Private group. It is the opposite of a `invitation`_. It should not
+be confused with `request_contact`_.
+
+:Sent to: The administrator of the group.
+:URL: *Group page* ``/request_message.html``
+:via: The request membership form
+  | ``gs.group.member.request.request.Request Form``
+  | ``gs.profile.notify.sender.MessageSender``
+  
+Reset password
+--------------
+
+A link to reset a password, sent to an email address that is submitted
+via the *Reset Password* page, when the email address is recognised
+as belonging to a user.
+
+:Sent to: The person that requested the password reset.
+:URL: None (see note below).
+:via:
+   | ``gs,profile.password.request.RequestPasswordResetForm``
+   | ``gs.profile.notify.notifyuser.NotifyUser.send_message``
+
+:Note: While the reset password message *is* stored on the file-system, it
+       is constructed in a unique way by the
+       ``.createresetmessage.create_reset_message`` function, rather than
+       by a page.
+
+Topic Digest
+------------
+
+The topic digest contains a summary of the topics that were discussed
+recently in the group. A "cron-job" is used to regularly send out
+the digests.
+
+The topic digest is the oldest file-system-side notifications. It
+was partly an experiment in how to create such a system. As
+such, it requires a rewrite to bring it into line with the other
+file-system-side notifications, which use the ``MessageSender`` class.
+
+:Sent to: All group members who have elected to receive posts in digest form.
+:URL: *Group Page* ``/digest.txt``    
+:via:
+  | ``gs.group.messages.senddigest.script.main``
+  | ``gs.group.messages.senddigest.script.send_digest``
+  | ``gs.group.messages.topicsdigest.sendDigest.SendAllDigests``
+  | ...
+  |   ``gs.group.messages.topicsdigest.notifiermessages.WeeklyMessage``
+  |   ``gs.group.messages.topicsdigest.notifiermessages.DailyMessage``
+
+Unknown Email Address
+---------------------
+
+A post is received by the mailing list from an unregistered email
+address. It is the equivalent of the `cannot post`_ notification for
+anonymous people.
+
+:Sent to: The unrecognised email address, which sent the original message.
+:URL: *Group Page* ``/unknown-email.html``
+:via:
+  | ``Products.XWFMailingListManager.XWFMailingList.processMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``gs.group.member.canpost.unknownemail.Notifier``
+  |
+  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``gs.group.member.canpost.unknownemail.Notifier``
+  | 
+  | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
+  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
+  | ``gs.group.member.canpost.unknownemail.Notifier``
+
 Verify Email Address
 --------------------
 
@@ -164,97 +255,6 @@ sends the verification message for all higher-level code.
   |
   | Adding a new email address
   | ``gs.profile.email.settings.settings.ChangeEmailSettingsForm``
-
-Request Membership
-------------------
-
-This message is sent when someone requests to become a member of a
-Private group. It is the opposite of a `invitation`_. It should not
-be confused with `request_contact`_.
-
-:Sent to: The administrator of the group.
-:URL: *Group page* ``/request_message.html``
-:via: The request membership form
-  | ``gs.group.member.request.request.Request Form``
-  | ``gs.profile.notify.sender.MessageSender``
-  
-Topic Digest
-------------
-
-The topic digest contains a summary of the topics that were discussed
-recently in the group. A "cron-job" is used to regularly send out
-the digests.
-
-The topic digest is the oldest file-system-side notifications. It
-was partly an experiment in how to create such a system. As
-such, it requires a rewrite to bring it into line with the other
-file-system-side notifications, which use the ``MessageSender`` class.
-
-:Sent to: All group members who have elected to receive posts in digest form.
-:URL: *Group Page* ``/digest.txt``    
-:via:
-  | ``gs.group.messages.senddigest.script.main``
-  | ``gs.group.messages.senddigest.script.send_digest``
-  | ``gs.group.messages.topicsdigest.sendDigest.SendAllDigests``
-  | ...
-  |   ``gs.group.messages.topicsdigest.notifiermessages.WeeklyMessage``
-  |   ``gs.group.messages.topicsdigest.notifiermessages.DailyMessage``
-
-Cannot Post
------------
-
-Sent to a person with a profile when they attempt to post to a group, 
-but disallowed. The content of the message comes from the viewlets that
-make up the ``gs.group.type.*`` eggs. For people people without a 
-profile see `unknown email address`_.
-
-:Sent to: The a person with a profile that cannot post to the group.
-:URL: *Group Page* ``/cannot-post.html``
-:via:
-  | ``Products.XWFMailingListManager.XWFMailingList.checkMail``
-  | ``gs.group.member.canpost.notifier.Notifier``
-  | ``gs.group.member.canpost.notifier.CannotPostMessageSender``
-  | ``gs.profile.notify.notifyuser.NotifyUser``
-
-Unknown Email Address
----------------------
-
-A post is received by the mailing list from an unregistered email
-address. It is the equivalent of the `cannot post`_ notification for
-anonymous people.
-
-:Sent to: The unrecognised email address, which sent the original message.
-:URL: *Group Page* ``/unknown-email.html``
-:via:
-  | ``Products.XWFMailingListManager.XWFMailingList.processMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
-  | ``gs.group.member.canpost.unknownemail.Notifier``
-  |
-  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
-  | ``gs.group.member.canpost.unknownemail.Notifier``
-  | 
-  | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_reply``
-  | ``gs.group.member.canpost.unknownemail.Notifier``
-
-Reset password
---------------
-
-A link to reset a password, sent to an email address that is submitted
-via the *Reset Password* page, when the email address is recognised
-as belonging to a user.
-
-:Sent to: The person that requested the password reset.
-:URL: None (see note below).
-:via:
-   | ``gs,profile.password.request.RequestPasswordResetForm``
-   | ``gs.profile.notify.notifyuser.NotifyUser.send_message``
-
-:Note: While the reset password message *is* stored on the file-system, it
-       is constructed in a unique way by the
-       ``.createresetmessage.create_reset_message`` function, rather than
-       by a page.
 
 Notification Templates
 ======================
