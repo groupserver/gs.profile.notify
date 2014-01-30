@@ -65,10 +65,10 @@ join the group. It is also used to present the administrator with a
   | ``gs.group.member.invite.json.api.InviteUserAPI``
   | ``gs.group.member.invite.base.processor.InviteProcessor``
   | ...
-
-:TODO (`3478`_): Resend Invitation (Manage Members) #3481
-
-.. _3478: https://redmine.iopen.net/issues/3478
+  |
+  | Resend: ``gs.group.member.invite.resend.reinvite.ResendInvitationForm``
+  | ``gs.group.member.invite.base.processor.InviteProcessor``
+  | ...
 
 Group Welcome
 -------------
