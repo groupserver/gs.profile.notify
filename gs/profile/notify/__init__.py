@@ -12,9 +12,10 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
+from __future__ import absolute_import, unicode_literals
 #lint:disable
-from notifyuser import NotifyUser
-from sender import MessageSender
+from .notifyuser import NotifyUser
+from .sender import MessageSender
 #lint:enable
 
 from AccessControl import ModuleSecurityInfo
