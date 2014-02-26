@@ -5,7 +5,7 @@ GroupServer Notifications
 :Authors: Alice Murphy; Michael JasonSmith
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
 :Organization: `GroupServer.org`_
-:Date: 2014-01-29
+:Date: 2014-02-26
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
   by `OnlineGroups.Net`_.
@@ -176,15 +176,11 @@ via the *Reset Password* page, when the email address is recognised
 as belonging to a user.
 
 :Sent to: The person that requested the password reset.
-:URL: None (see note below).
+:URL: ``gs-profile-password-reset-message.html`` in the context of a user.
 :via:
    | ``gs,profile.password.request.RequestPasswordResetForm``
-   | ``gs.profile.notify.notifyuser.NotifyUser.send_message``
-
-:Note: While the reset password message *is* stored on the file-system, it
-       is constructed in a unique way by the
-       ``.createresetmessage.create_reset_message`` function, rather than
-       by a page.
+   | ``gs,profile.password.notifier.ResetNotifier``
+   | ``gs.profile.notify.sender.MessageSender``
 
 Topic Digest
 ------------
