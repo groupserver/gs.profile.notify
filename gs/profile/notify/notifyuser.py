@@ -13,6 +13,8 @@
 #
 ##############################################################################
 from __future__ import absolute_import
+import logging
+log = logging.getLogger("gs.profile.notify.notifyuser")
 from zope.cachedescriptors.property import Lazy
 from zope.component import createObject, adapts
 from zope.interface import implements
@@ -22,9 +24,6 @@ from Products.CustomUserFolder.interfaces import ICustomUser, IGSUserInfo
 from Products.XWFCore.XWFUtils import get_support_email
 from .interfaces import IGSNotifyUser
 from .audit import Auditor, SEND_NOTIFICATION, SEND_MESSAGE
-
-import logging
-log = logging.getLogger("gs.profile.notify.notifyuser")
 
 
 class NotifyUser(object):
