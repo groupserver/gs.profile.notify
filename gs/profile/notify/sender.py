@@ -108,7 +108,7 @@ class MessageSender(object):
             u = self.context.acl_users.get_userByEmail(address)
             assert u, 'Could not find user for <%s>' % address
             userInfo = IGSUserInfo(u)
-            retval = self.get_addrr_line(userInfo.name, address)
+            retval = self.get_addr_line(userInfo.name, address)
         else:
             name = self.siteInfo.name + _(' Support')
             email = self.siteInfo.get_support_email()
