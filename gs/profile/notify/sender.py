@@ -12,7 +12,7 @@
 # FOR A PARTICULAR PURPOSE.
 #
 ##############################################################################
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
@@ -21,11 +21,12 @@ from zope.i18nmessageid import MessageFactory
 from zope.component import createObject
 from zope.cachedescriptors.property import Lazy
 _ = MessageFactory('groupserver')
+from gs.core import to_unicode_or_bust
 from gs.profile.email.base.emailuser import EmailUser
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from .audit import Auditor, CREATE_MESSAGE
 from .notifyuser import NotifyUser
-utf8 = 'utf-8'
+UTF8 = 'utf-8'
 
 
 class MessageSender(object):
@@ -66,11 +67,12 @@ class MessageSender(object):
         auditor.info(CREATE_MESSAGE, subject)
 
         container = MIMEMultipart('alternative')
-        container['Subject'] = str(Header(subject, utf8))
+        container['Subject'] = str(Header(subject, UTF8))
         container['From'] = self.from_header_from_address(fromAddress)
         container['To'] = self.to_header_from_addresses(toAddresses)
 
-        txt = MIMEText(txtMessage.encode(utf8), 'plain', utf8)
+        # FIXME: The txtMessage argument should not have to be encoded.
+        txt = MIMEText(txtMessage.encode(UTF8), 'plain', UTF8)
         container.attach(txt)
 
         if htmlMessage:
@@ -78,7 +80,7 @@ class MessageSender(object):
             # multipart message with only one part: "The body must then
             # contain one or more body parts\ldots"
             # <http://tools.ietf.org/html/rfc2046#section-5.1>
-            html = MIMEText(htmlMessage.encode(utf8), 'html', utf8)
+            html = MIMEText(htmlMessage.encode(UTF8), 'html', UTF8)
             container.attach(html)
         retval = container.as_string()
         assert retval
@@ -91,16 +93,26 @@ class MessageSender(object):
             retval = self.siteInfo.get_support_email()
         return retval
 
+    @classmethod
+    def get_addr_line(cls, name, addr):
+        # --=mpj17=-- In Python 3 just using formataddr, sans the Header, will
+        #  work. This method should be removed.
+        unicodeName = to_unicode_or_bust(name)
+        headerName = Header(unicodeName, UTF8)
+        encodedName = headerName.encode()
+        retval = formataddr((encodedName, addr))
+        return retval
+
     def from_header_from_address(self, address):
         if address:
             u = self.context.acl_users.get_userByEmail(address)
             assert u, 'Could not find user for <%s>' % address
             userInfo = IGSUserInfo(u)
-            retval = formataddr((userInfo.name.encode(utf8), address))
+            retval = self.get_addrr_line(userInfo.name, address)
         else:
             name = self.siteInfo.name + _(' Support')
             email = self.siteInfo.get_support_email()
-            retval = formataddr((name.encode(utf8), email))
+            retval = self.get_addr_line(name, email)
         assert retval
         return retval
 
@@ -109,8 +121,7 @@ class MessageSender(object):
             addresses = self.emailUser.get_delivery_addresses()
         assert addresses, 'No addresses for %s (%s)' % \
             (self.toUserInfo.name, self.toUserInfo.id)
-        fn = self.toUserInfo.name.encode(utf8)
-        retval = ', '.join([formataddr((fn.encode(utf8), a))
-                            for a in addresses])
+        fn = self.toUserInfo.name.encode(UTF8)
+        retval = ', '.join([self.get_addr_line(fn, a) for a in addresses])
         assert retval
         return retval
