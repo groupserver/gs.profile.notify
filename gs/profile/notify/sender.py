@@ -33,18 +33,17 @@ class MessageSender(object):
     def __init__(self, context, toUserInfo):
         self.context = context
         self.toUserInfo = toUserInfo
+        assert self.context
+        assert self.toUserInfo
 
     @Lazy
     def emailUser(self):
-        assert self.context
-        assert self.toUserInfo
         retval = EmailUser(self.context, self.toUserInfo)
         assert retval, 'Could not create the email-user'
         return retval
 
     @Lazy
     def siteInfo(self):
-        assert self.context
         retval = createObject('groupserver.SiteInfo', self.context)
         assert retval, 'Could not create the site info'
         return retval
@@ -62,7 +61,6 @@ class MessageSender(object):
 
     def create_message(self, subject, txtMessage, htmlMessage,
                         fromAddress, toAddresses):
-
         auditor = Auditor(self.siteInfo, self.toUserInfo)
         auditor.info(CREATE_MESSAGE, subject)
 
@@ -93,8 +91,8 @@ class MessageSender(object):
             retval = self.siteInfo.get_support_email()
         return retval
 
-    @classmethod
-    def get_addr_line(cls, name, addr):
+    @staticmethod
+    def get_addr_line(name, addr):
         # --=mpj17=-- In Python 3 just using formataddr, sans the Header, will
         #  work. This method should be removed.
         unicodeName = to_unicode_or_bust(name)
@@ -106,7 +104,9 @@ class MessageSender(object):
     def from_header_from_address(self, address):
         if address:
             u = self.context.acl_users.get_userByEmail(address)
-            assert u, 'Could not find user for <%s>' % address
+            if not u:
+                msg = 'Could not find user for <{0}>'.format(address)
+                raise ValueError(msg)
             userInfo = IGSUserInfo(u)
             retval = self.get_addr_line(userInfo.name, address)
         else:
@@ -119,8 +119,10 @@ class MessageSender(object):
     def to_header_from_addresses(self, addresses):
         if not addresses:
             addresses = self.emailUser.get_delivery_addresses()
-        assert addresses, 'No addresses for %s (%s)' % \
-            (self.toUserInfo.name, self.toUserInfo.id)
+        if not addresses:
+            m = 'No addresses for {0} ({1})'
+            msg = m.format(self.toUserInfo.name, self.toUserInfo.id)
+            raise ValueError(msg)
         fn = self.toUserInfo.name.encode(UTF8)
         retval = ', '.join([self.get_addr_line(fn, a) for a in addresses])
         assert retval
