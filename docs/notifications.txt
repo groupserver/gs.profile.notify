@@ -252,58 +252,57 @@ sends the verification message for all higher-level code.
   | Adding a new email address
   | ``gs.profile.email.settings.settings.ChangeEmailSettingsForm``
 
+Bounce
+------
+
+When GroupServer gets an XVERP return it logs a bounce. If the
+group member has another email address then the user is told of
+the bounce on the extra address.
+
+:Sent to: The person who has the bouncing address
+:URL: *Group page* ``/gs-group-member-bounce-bouncing.html``
+:via: The *Handle bounce* page
+
+  | ``gs.group.member.bounce.handlebounce.HandleBounce``
+  | ``gs.group.member.bounce.notifier.UserBounceNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
+Disabled (user)
+---------------
+
+When an address continually bounces then the address is
+disabled. The user is told of this if he or she has an extra
+address.
+
+:Sent to: The person who has the bouncing address
+:URL: *Group page* ``/gs-group-member-bounce-disabled.html``
+:via: The *Handle bounce* page
+
+  | ``gs.group.member.bounce.handlebounce.HandleBounce``
+  | ``gs.group.member.bounce.notifier.UserDisabledNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
+Disabled (administrator)
+------------------------
+
+The administrator is told when a member has his or her email
+address disabled because of bouncing.
+
+:Sent to: The administrators of the group that sent the post that
+          bounced back.
+:URL: *Group page* ``/gs-group-member-bounce-disabled-admin.html``
+:via: The *Handle bounce* page
+
+  | ``gs.group.member.bounce.handlebounce.HandleBounce``
+  | ``gs.group.member.bounce.notifier.AdminDisabledNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
 Notification Templates
 ======================
 
 These are the old notifications. They are DTML templates: this is the
 folder in which ``Products.CustomUserFolder.Customuser.send_notification``
 looks to find the notifications passed to it by ID.
-
-``bounce_detection``
---------------------
-
-Sent to a user when it is detected that one of their email addresses
-is not accepting email that GroupServer attempts to deliver (the
-address is "bouncing"). The notification is sent to all *other*
-addresses that the user has registered, up to once per day.
-
-:Sent to: The member, at their other email addresses.
-
-:via:
-  | ``gs.group.email.add.smtp2gs.script``
-  | ``gs.group.email.add.smtp2gs.xverp.handle_bounce``
-  | ``gs.group.email.add.smtp2gs.servercomms.add_bounce``
-  | The entire Zope2 page presentation stack
-  | ``gs.group.member.bounce.handlebounce.HandleBounce.handle_the_jandal``
-  | ``gs.group.member.bounce.handlebounce.HandleBounce.notify_bounce``
-  | ``gs.profile.notify.notifyuser.NotifyUser.send_notification``
-
-:See also: `Feature 4065`_
-
-.. _Feature 4065: https://redmine.iopen.net/issues/4065
-
-``disabled_email``
-------------------
-
-Sent to a user when it is detected that one of their email addresses
-has refused to accept email from GroupServer for five or more unique
-days out of the last 60. The notification is sent to all other
-addresses that the user has added to his or her profile.
-
-:Sent to: The member, at their other email addresses.
-
-:via:
-  | ``gs.group.email.add.smtp2gs.script``
-  | ``gs.group.email.add.smtp2gs.xverp.handle_bounce``
-  | ``gs.group.email.add.smtp2gs.servercomms.add_bounce``
-  | The entire Zope2 page presentation stack
-  | ``gs.group.member.bounce.handlebounce.HandleBounce.handle_the_jandal``
-  | ``gs.group.member.bounce.handlebounce.HandleBounce.notify_disabled``
-  | ``gs.profile.notify.notifyuser.NotifyUser.send_notification``
-
-:See also: `Feature 4066`_
-
-.. _Feature 4066: https://redmine.iopen.net/issues/4066
 
 ``del_group``
 -------------
