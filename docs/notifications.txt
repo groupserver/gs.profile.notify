@@ -5,7 +5,7 @@ GroupServer Notifications
 :Authors: Alice Murphy; Michael JasonSmith
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
 :Organization: `GroupServer.org`_
-:Date: 2014-02-26
+:Date: 2014-09-03
 :Copyright: This document is licensed under a
   `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
   by `OnlineGroups.Net`_.
@@ -267,12 +267,16 @@ the bounce on the extra address.
   | ``gs.group.member.bounce.notifier.UserBounceNotifier``
   | ``gs.profile.notify.sender.MessageSender``
 
-Disabled (user)
----------------
+Disabled
+--------
 
-When an address continually bounces then the address is
-disabled. The user is told of this if he or she has an extra
-address.
+When an address continually bounces then the address is disabled.
+
+Disabled (user)
+~~~~~~~~~~~~~~~
+
+The user is told of that an address is disabled if he or she has
+an extra address.
 
 :Sent to: The person who has the bouncing address
 :URL: *Group page* ``/gs-group-member-bounce-disabled.html``
@@ -283,7 +287,7 @@ address.
   | ``gs.profile.notify.sender.MessageSender``
 
 Disabled (administrator)
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The administrator is told when a member has his or her email
 address disabled because of bouncing.
@@ -297,62 +301,53 @@ address disabled because of bouncing.
   | ``gs.group.member.bounce.notifier.AdminDisabledNotifier``
   | ``gs.profile.notify.sender.MessageSender``
 
+Leave
+-----
+
+Like joining, the member and the administrators are told that
+someone has left a group.
+
+Leave (past member)
+-------------------
+
+:Sent to: The person who has just left a group
+:URL: *Group page* ``/gs-group-member-leave-notification.html``
+:via: The *Leave* page
+
+  | ``gs.group.member.leave.leave.LeaveForm``
+  | ``gs.group.member.leave.notifier.LeaveNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
+:via: The *Unsubscribe* command
+
+  | ``gs.group.member.leave.command.LeaveCommand``
+  | ``gs.group.member.leave.notifier.LeaveNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
+Leave (administrator)
+---------------------
+
+:Sent to: The administrators of a group from which a person has
+          just left.
+:URL: *Group page* ``/gs-group-member-leave-left.html``
+:via: The *Leave* page
+
+  | ``gs.group.member.leave.leave.LeaveForm``
+  | ``gs.group.member.leave.notifier.LeftNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
+:via: The *Unsubscribe* command
+
+  | ``gs.group.member.leave.command.LeaveCommand``
+  | ``gs.group.member.leave.notifier.LeftNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
 Notification Templates
 ======================
 
 These are the old notifications. They are DTML templates: this is the
 folder in which ``Products.CustomUserFolder.Customuser.send_notification``
 looks to find the notifications passed to it by ID.
-
-``del_group``
--------------
-
-Sent to a member when they leave a group.
-
-:Sent to: The former member of the group, that has just left.
-
-:via:
-  | A logged in member clicks ``Leave`` on the groups page or a group 
-    homepage.
-  | ``Products.GroupServer.Scripts.set.subscribe_group``
-  | ``Products.CustomUserFolder.CustomUser.del_groupWithNotification``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-  |
-  | An administrator removes a member from the group.
-  | ``...``
-  |  (The Manage Members page is currently undergoing changes. This information 
-  |   will be added once the new page is deployed.)
-
-:See also: `Feature 4062`_
-
-.. _Feature 4062: https://redmine.iopen.net/issues/4062
-
-``leave_group_admin``
----------------------
-
-Notify the administrators and the participation coach that a member has 
-left the group.
-
-:Sent to: The participation coach.
-
-:via:
-  | A logged in **member** clicks ``Leave`` on the groups index page or 
-    the group homepage.
-  | ``Products.GroupServer.Scripts.set.subscribe_group``
-  | ``Products.CustomUserFolder.CustomUser.add_groupWithNotification``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-  |
-  | **An administrator** who is not the participation coach removes a
-    member from the group.
-  | ``...``
-  | (The Manage Members page is currently undergoing changes. This information 
-  |  will be added once the new page is deployed.)
-  | ``Products.CustomUserFolder.CustomUser.add_groupWithNotification``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-
-:See also: `Feature 4063`_
-
-.. _Feature 4063: https://redmine.iopen.net/issues/4063
 
 ``request_contact``
 -------------------
