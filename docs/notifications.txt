@@ -185,9 +185,14 @@ as belonging to a user.
 Topic Digest
 ------------
 
-The topic digest contains a summary of the topics that were discussed
-recently in the group. A "cron-job" is used to regularly send out
-the digests.
+The topic digest contains a summary of the topics that were
+discussed recently in the group. A "cron-job" is used to
+regularly send out the digests. The digest system consists of
+three notifications: `the digest itself`_, the `digest on
+command`_, and the `digest off command`_.
+
+The digest itself
+~~~~~~~~~~~~~~~~~
 
 The topic digest is the oldest file-system-side notifications. It
 was partly an experiment in how to create such a system. As
@@ -203,6 +208,37 @@ file-system-side notifications, which use the ``MessageSender`` class.
   | ...
   |   ``gs.group.messages.topicsdigest.notifiermessages.WeeklyMessage``
   |   ``gs.group.messages.topicsdigest.notifiermessages.DailyMessage``
+
+Digest on command
+~~~~~~~~~~~~~~~~~
+
+There is an email-command to turn the digest on. It is triggered
+when a group member sends an email to the group with the subject
+``digest on`` (case insensitive).
+
+:Sent to: The person that asked for the digest to be turned on
+:URL: ``gs-group-member-email-settings-digest-on.html`` in the
+      context of a group.
+:via:
+   | ``gs.group.member.email.settings.listcommand.DigestCommand``
+   | ``gs.group.member.email.settings.notifier.DigestOnNotifier``
+   | ``gs.profile.notify.sender.MessageSender``
+
+Digest off command
+~~~~~~~~~~~~~~~~~~
+
+There is an email-command to turn the digest on. It is triggered
+when a group member sends an email to the group with the subject
+``digest on`` (case insensitive).
+
+:Sent to: The person that asked for the digest to be turned on
+:URL: ``gs-group-member-email-settings-digest-off.html`` in the
+      context of a group.
+:via:
+   | ``gs.group.member.email.settings.listcommand.DigestCommand``
+   | ``gs.group.member.email.settings.notifier.DigestOffNotifier``
+   | ``gs.profile.notify.sender.MessageSender``
+
 
 Unknown Email Address
 ---------------------
@@ -305,10 +341,12 @@ Leave
 -----
 
 Like joining, the member and the administrators are told that
-someone has left a group.
+someone has left a group. A person can leave in two ways: using
+the Web or sending an email with the subject ``unsubscribe``
+(case insensitive) to the group.
 
 Leave (past member)
--------------------
+~~~~~~~~~~~~~~~~~~~
 
 :Sent to: The person who has just left a group
 :URL: *Group page* ``/gs-group-member-leave-notification.html``
@@ -325,7 +363,7 @@ Leave (past member)
   | ``gs.profile.notify.sender.MessageSender``
 
 Leave (administrator)
----------------------
+~~~~~~~~~~~~~~~~~~~~~
 
 :Sent to: The administrators of a group from which a person has
           just left.
@@ -341,6 +379,22 @@ Leave (administrator)
   | ``gs.group.member.leave.command.LeaveCommand``
   | ``gs.group.member.leave.notifier.LeftNotifier``
   | ``gs.profile.notify.sender.MessageSender``
+
+Not a member
+~~~~~~~~~~~~
+
+If someone tries to leave, but the email address in the ``From``
+header does not match then a special *Not a Member* email is sent.
+
+:Sent to: The person who has asked to leave a group
+:URL: *Groups* ``/gs-group-member-leave-not-a-member.html``
+      (**Note** not the *group* page.)
+:via: The *Unsubscribe* command
+
+  | ``gs.group.member.leave.listcommand.LeaveCommand``
+  | ``gs.group.member.leave.notifiernonmember.NotMemberNotifier``
+  | ``gs.profile.notify.sender.MessageSender``
+
 
 Notification Templates
 ======================
@@ -437,37 +491,6 @@ A group member sends an email that breaches the message size limit to the group.
 **via**
   | ``Products.XWFMailingListManager.XWFMailingList.mail_event_default``
   | ``ListManager/xwf_email_event``
-
-``email_digest_off``
---------------------
-
-A "digest off" command is received by the group mailing list from an email
-address belonging to a group member.
-
-**Sent to**
-  ``The email address from which the command originated``
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.digest_off``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_digest_off``
-  | ``ListManager/xwf_email_digest_off``
-
-
-``email_digest_on``
--------------------
-
-A "digest on" command is received by the group mailing list from an email
-address belonging to a group member.
-
-**Sent to**
-  ``The email address from which the command originated``
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.digest_on``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_digest_on``
-  | ``ListManager/xwf_email_digest_on``
 
 
 ``email_footer``
