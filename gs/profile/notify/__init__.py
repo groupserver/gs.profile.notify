@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, unicode_literals
 #lint:disable
-from .notifier import NotifierABC
 from .notifyuser import NotifyUser
 from .sender import MessageSender
 #lint:enable
