@@ -16,7 +16,7 @@ from __future__ import absolute_import, unicode_literals
 from pytz import UTC
 from datetime import datetime
 from zope.component.interfaces import IFactory
-from zope.interface import implements, implementedBy
+from zope.interface import implementer, implementedBy
 from gs.core import to_ascii
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from Products.GSAuditTrail import (IAuditEvent, BasicAuditEvent,
@@ -31,9 +31,8 @@ SEND_MESSAGE = '2'
 CREATE_MESSAGE = '3'
 
 
+@implementer(IFactory)
 class AuditEventFactory(object):
-    implements(IFactory)
-
     title = 'User Profile Notification Audit-Event Factory'
     description = 'Creates a GroupServer audit event for notifications'
 
@@ -65,6 +64,7 @@ class AuditEventFactory(object):
         return implementedBy(BasicAuditEvent)
 
 
+@implementer(IAuditEvent)
 class SendNotificationEvent(BasicAuditEvent):
     """A user being send a standard notificaion.
 
@@ -74,8 +74,6 @@ class SendNotificationEvent(BasicAuditEvent):
     ``supplementaryDatum``
         The ID of the notification that is sent.
     """
-    implements(IAuditEvent)
-
     def __init__(self, context, eventId, d, userInfo, siteInfo,
                  instanceDatum, supplementaryDatum):
         super(SendNotificationEvent, self).__init__(
@@ -99,6 +97,7 @@ class SendNotificationEvent(BasicAuditEvent):
         return retval
 
 
+@implementer(IAuditEvent)
 class SendMessageEvent(BasicAuditEvent):
     """A message being sent to the user.
 
@@ -108,8 +107,6 @@ class SendMessageEvent(BasicAuditEvent):
     ``supplementaryDatum``
         The length of the message.
     """
-    implements(IAuditEvent)
-
     def __init__(self, context, eventId, d, userInfo, siteInfo,
                  instanceDatum, supplementaryDatum):
 
@@ -134,14 +131,13 @@ class SendMessageEvent(BasicAuditEvent):
         return retval
 
 
+@implementer(IAuditEvent)
 class CreateMessageEvent(BasicAuditEvent):
     """A notification being created.
 
     ``instanceDatum``
         The subject line of the notification.
     """
-    implements(IAuditEvent)
-
     def __init__(self, context, eventId, d, userInfo, siteInfo,
                  instanceDatum):
 
