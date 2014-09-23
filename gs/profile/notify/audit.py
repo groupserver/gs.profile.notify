@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
-# Copyright © 2013 OnlineGroups.net and Contributors.
+# Copyright © 2013, 2014 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -11,15 +11,16 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
+############################################################################
+from __future__ import absolute_import, unicode_literals
 from pytz import UTC
 from datetime import datetime
 from zope.component.interfaces import IFactory
 from zope.interface import implements, implementedBy
+from gs.core import to_ascii
 from Products.CustomUserFolder.interfaces import IGSUserInfo
-from Products.GSAuditTrail import IAuditEvent, BasicAuditEvent, \
-  AuditQuery, event_id_from_data
-
+from Products.GSAuditTrail import (IAuditEvent, BasicAuditEvent,
+                                   AuditQuery, event_id_from_data)
 SUBSYSTEM = 'gs.profile.notify'
 import logging
 log = logging.getLogger(SUBSYSTEM)
@@ -33,29 +34,30 @@ CREATE_MESSAGE = '3'
 class AuditEventFactory(object):
     implements(IFactory)
 
-    title = u'User Profile Notification Audit-Event Factory'
-    description = u'Creates a GroupServer audit event for notifications'
+    title = 'User Profile Notification Audit-Event Factory'
+    description = 'Creates a GroupServer audit event for notifications'
 
     def __call__(self, context, event_id, code, date, userInfo,
-                instanceUserInfo, siteInfo, groupInfo=None,
-                instanceDatum='', supplementaryDatum='', subsystem=''):
+                 instanceUserInfo, siteInfo, groupInfo=None,
+                 instanceDatum='', supplementaryDatum='', subsystem=''):
 
         if (code == SEND_NOTIFICATION):
             event = SendNotificationEvent(context, event_id, date,
-                                            userInfo, siteInfo,
-                                            instanceDatum,
-                                            supplementaryDatum)
+                                          userInfo, siteInfo,
+                                          instanceDatum,
+                                          supplementaryDatum)
         elif (code == SEND_MESSAGE):
             event = SendMessageEvent(context, event_id, date, userInfo,
-                                        siteInfo, instanceDatum,
-                                        supplementaryDatum)
+                                     siteInfo, instanceDatum,
+                                     supplementaryDatum)
         elif (code == CREATE_MESSAGE):
             event = CreateMessageEvent(context, event_id, date, userInfo,
-                                        siteInfo, instanceDatum)
+                                       siteInfo, instanceDatum)
         else:
             event = BasicAuditEvent(context, event_id, UNKNOWN, date,
-              userInfo, instanceUserInfo, siteInfo, groupInfo,
-              instanceDatum, supplementaryDatum, SUBSYSTEM)
+                                    userInfo, instanceUserInfo, siteInfo,
+                                    groupInfo, instanceDatum,
+                                    supplementaryDatum, SUBSYSTEM)
         assert event
         return event
 
@@ -74,30 +76,25 @@ class SendNotificationEvent(BasicAuditEvent):
     """
     implements(IAuditEvent)
 
-    def __init__(self, context, id, d, userInfo, siteInfo, instanceDatum,
-                    supplementaryDatum):
-        BasicAuditEvent.__init__(self, context, id, SEND_NOTIFICATION,
-                                    d, userInfo, None, siteInfo, None,
-                                    instanceDatum, supplementaryDatum,
-                                    SUBSYSTEM)
+    def __init__(self, context, eventId, d, userInfo, siteInfo,
+                 instanceDatum, supplementaryDatum):
+        super(SendNotificationEvent, self).__init__(
+            context, eventId, SEND_NOTIFICATION, d, userInfo, None,
+            siteInfo, None, instanceDatum, supplementaryDatum, SUBSYSTEM)
 
     def __unicode__(self):
-        m = u'Sending the notification {0}/{1} to {2} ({3}) on {4} ({5})'
+        m = 'Sending the notification {0}/{1} to {2} ({3}) on {4} ({5})'
         retval = m.format(self.instanceDatum, self.supplementaryDatum,
                           self.userInfo.name, self.userInfo.id,
                           self.siteInfo.name, self.siteInfo.id)
         return retval
 
-    def __str__(self):
-        retval = unicode(self).encode('ascii', 'ignore')
-        return retval
-
     @property
     def xhtml(self):
-        cssClass = u'audit-event profile-notify-event-%s' % self.code
-        notif = u'<code class="notification">%s/%s</code>' % \
+        cssClass = 'audit-event profile-notify-event-%s' % self.code
+        notif = '<code class="notification">%s/%s</code>' % \
             (self.instanceDatum, self.supplementaryDatum)
-        retval = u'<span class="%s">Sent the notification %s.</span>' %\
+        retval = '<span class="%s">Sent the notification %s.</span>' %\
             (cssClass, notif)
         return retval
 
@@ -113,31 +110,27 @@ class SendMessageEvent(BasicAuditEvent):
     """
     implements(IAuditEvent)
 
-    def __init__(self, context, id, d, userInfo, siteInfo, instanceDatum,
-                    supplementaryDatum):
+    def __init__(self, context, eventId, d, userInfo, siteInfo,
+                 instanceDatum, supplementaryDatum):
 
-        BasicAuditEvent.__init__(self, context, id, SEND_MESSAGE, d,
-            userInfo, None, siteInfo, None, instanceDatum,
-            supplementaryDatum, SUBSYSTEM)
+        super(SendMessageEvent, self).__init__(
+            context, eventId, SEND_MESSAGE, d, userInfo, None, siteInfo,
+            None, instanceDatum, supplementaryDatum, SUBSYSTEM)
 
     def __unicode__(self):
-        r = u'Message of {0} characters being sent to the address <{1}> of '\
-            u'{2} ({3}) on {4} ({5})'
+        r = 'Message of {0} characters being sent to the address <{1}> of '\
+            '{2} ({3}) on {4} ({5})'
         retval = r.format(self.instanceDatum, self.supplementaryDatum,
-                            self.userInfo.name, self.userInfo.id,
-                            self.siteInfo.name, self.siteInfo.id)
-        return retval
-
-    def __str__(self):
-        retval = unicode(self).encode('ascii', 'ignore')
+                          self.userInfo.name, self.userInfo.id,
+                          self.siteInfo.name, self.siteInfo.id)
         return retval
 
     @property
     def xhtml(self):
-        cssClass = u'audit-event profile-notify-event-%s' % self.code
-        email = u'<code class="email">%s</code>' % self.supplementaryDatum
-        retval = u'<span class="%s">Message of %s characters sent to '\
-            u'%s.</span>' % (cssClass, self.instanceDatum, email)
+        cssClass = 'audit-event profile-notify-event-%s' % self.code
+        email = '<code class="email">%s</code>' % self.supplementaryDatum
+        retval = '<span class="%s">Message of %s characters sent to '\
+                 '%s.</span>' % (cssClass, self.instanceDatum, email)
         return retval
 
 
@@ -149,26 +142,24 @@ class CreateMessageEvent(BasicAuditEvent):
     """
     implements(IAuditEvent)
 
-    def __init__(self, context, id, d, userInfo, siteInfo, instanceDatum):
+    def __init__(self, context, eventId, d, userInfo, siteInfo,
+                 instanceDatum):
 
-        BasicAuditEvent.__init__(self, context, id, CREATE_MESSAGE, d,
-            userInfo, None, siteInfo, None, instanceDatum, None, SUBSYSTEM)
+        super(CreateMessageEvent, self).__init__(
+            context, eventId, CREATE_MESSAGE, d, userInfo, None, siteInfo,
+            None, instanceDatum, None, SUBSYSTEM)
 
     def __unicode__(self):
-        m = u'Notification "{0}" created for {1} ({2}) on {3} ({4})'
+        m = 'Notification "{0}" created for {1} ({2}) on {3} ({4})'
         retval = m.format(self.instanceDatum,
-                            self.userInfo.name, self.userInfo.id,
-                            self.siteInfo.name, self.siteInfo.id)
-        return retval
-
-    def __str__(self):
-        retval = unicode(self).encode('ascii', 'ignore')
+                          self.userInfo.name, self.userInfo.id,
+                          self.siteInfo.name, self.siteInfo.id)
         return retval
 
     @property
     def xhtml(self):
-        cssClass = u'audit-event profile-notify-event-{0}'.format(self.code)
-        r = u'<span class="{0}">Notification <cite>{1}</cite> created</span>'
+        cssClass = 'audit-event profile-notify-event-{0}'.format(self.code)
+        r = '<span class="{0}">Notification <cite>{1}</cite> created</span>'
         retval = r.format(cssClass, self.instanceDatum)
         return retval
 
@@ -193,12 +184,14 @@ class Auditor(object):
 
     def info(self, code, instanceDatum='', supplementaryDatum=''):
         d = datetime.now(UTC)
+        iD = to_ascii(instanceDatum)
+        sD = to_ascii(supplementaryDatum)
         eventId = event_id_from_data(self.userInfo, self.userInfo,
-            self.siteInfo, code, instanceDatum, supplementaryDatum)
+                                     self.siteInfo, code, iD, sD)
 
         e = self.factory(self.userInfo.user, eventId, code, d,
-                self.userInfo, None, self.siteInfo, None,
-                instanceDatum, supplementaryDatum, SUBSYSTEM)
+                         self.userInfo, None, self.siteInfo, None,
+                         instanceDatum, supplementaryDatum, SUBSYSTEM)
 
         self.queries.store(e)
         log.info(e)
