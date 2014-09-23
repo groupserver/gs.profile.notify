@@ -17,7 +17,7 @@ from pytz import UTC
 from datetime import datetime
 from zope.component.interfaces import IFactory
 from zope.interface import implementer, implementedBy
-from gs.core import to_ascii
+from gs.core import to_ascii, to_unicode_or_bust
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from Products.GSAuditTrail import (IAuditEvent, BasicAuditEvent,
                                    AuditQuery, event_id_from_data)
@@ -117,9 +117,13 @@ class SendMessageEvent(BasicAuditEvent):
     def __unicode__(self):
         r = 'Message of {0} characters being sent to the address <{1}> of '\
             '{2} ({3}) on {4} ({5})'
-        retval = r.format(self.instanceDatum, self.supplementaryDatum,
-                          self.userInfo.name, self.userInfo.id,
-                          self.siteInfo.name, self.siteInfo.id)
+        retval = r.format(to_unicode_or_bust(self.instanceDatum),
+                          to_unicode_or_bust(self.supplementaryDatum),
+                          to_unicode_or_bust(self.userInfo.name),
+                          to_unicode_or_bust(self.userInfo.id),
+                          to_unicode_or_bust(self.siteInfo.name),
+                          to_unicode_or_bust(self.siteInfo.id))
+        assert type(retval) == unicode
         return retval
 
     @property
@@ -147,9 +151,12 @@ class CreateMessageEvent(BasicAuditEvent):
 
     def __unicode__(self):
         m = 'Notification "{0}" created for {1} ({2}) on {3} ({4})'
-        retval = m.format(self.instanceDatum,
-                          self.userInfo.name, self.userInfo.id,
-                          self.siteInfo.name, self.siteInfo.id)
+        retval = m.format(to_unicode_or_bust(self.instanceDatum),
+                          to_unicode_or_bust(self.userInfo.name),
+                          to_unicode_or_bust(self.userInfo.id),
+                          to_unicode_or_bust(self.siteInfo.name),
+                          to_unicode_or_bust(self.siteInfo.id))
+        assert type(retval) == unicode
         return retval
 
     @property
