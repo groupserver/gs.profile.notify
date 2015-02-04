@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
 # Copyright © 2013 OnlineGroups.net and Contributors.
 # All Rights Reserved.
@@ -11,7 +11,7 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
+############################################################################
 from __future__ import absolute_import, unicode_literals
 from email.Header import Header
 from email.MIMEText import MIMEText
@@ -21,7 +21,7 @@ from zope.i18nmessageid import MessageFactory
 from zope.component import createObject
 from zope.cachedescriptors.property import Lazy
 _ = MessageFactory('groupserver')
-from gs.core import to_unicode_or_bust
+from gs.core import (to_unicode_or_bust, curr_time)
 from gs.profile.email.base.emailuser import EmailUser
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from .audit import Auditor, CREATE_MESSAGE
@@ -49,7 +49,7 @@ class MessageSender(object):
         return retval
 
     def send_message(self, subject, txtMessage, htmlMessage='',
-                        fromAddress=None, toAddresses=None):
+                     fromAddress=None, toAddresses=None):
         msg = self.create_message(subject, txtMessage, htmlMessage,
                                   fromAddress, toAddresses)
         notifyUser = NotifyUser(self.toUserInfo.user)
@@ -60,7 +60,7 @@ class MessageSender(object):
             notifyUser.send_message(msg, addr, fromAddr)
 
     def create_message(self, subject, txtMessage, htmlMessage,
-                        fromAddress, toAddresses):
+                       fromAddress, toAddresses):
         auditor = Auditor(self.siteInfo, self.toUserInfo)
         auditor.info(CREATE_MESSAGE, subject)
 
@@ -93,8 +93,8 @@ class MessageSender(object):
 
     @staticmethod
     def get_addr_line(name, addr):
-        # --=mpj17=-- In Python 3 just using formataddr, sans the Header, will
-        #  work. This method should be removed.
+        # --=mpj17=-- In Python 3 just using formataddr, sans the Header,
+        #  will work. This method should be removed.
         unicodeName = to_unicode_or_bust(name)
         headerName = Header(unicodeName, UTF8)
         encodedName = headerName.encode()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-##############################################################################
+############################################################################
 #
 # Copyright © 2013 OnlineGroups.net and Contributors.
 # All Rights Reserved.
@@ -11,7 +11,7 @@
 # WARRANTIES OF TITLE, MERCHANTABILITY, AGAINST INFRINGEMENT, AND FITNESS
 # FOR A PARTICULAR PURPOSE.
 #
-##############################################################################
+############################################################################
 from __future__ import absolute_import
 import logging
 log = logging.getLogger("gs.profile.notify.notifyuser")
@@ -65,14 +65,14 @@ class NotifyUser(object):
             retval = [e for e in self.addresses if e.lower() in toAddrs]
         else:
             retval = [e.lower()
-                        for e in self.emailUser.get_verified_addresses()]
+                      for e in self.emailUser.get_verified_addresses()]
         assert type(retval) == list
         log.warn('%s has no email addresses to send the notification to.' %
-             self.user.getId())
+                 self.user.getId())
         return retval
 
     def send_notification(self, n_type, n_id='default', n_dict=None,
-                            email_only=()):
+                          email_only=()):
         if not n_dict:
             n_dict = {}
         self.auditor.info(SEND_NOTIFICATION, n_type, n_id)
@@ -103,7 +103,7 @@ class NotifyUser(object):
                     getattr(ptype_templates.aq_explicit, 'default', None))
         assert template, 'No template found for %s/%s' % (n_type, n_id)
         retval = template(self.user, None, to_addr=email_address,
-                            n_id=n_id, n_type=n_type, n_dict=n_dict)
+                          n_id=n_id, n_type=n_type, n_dict=n_dict)
         if isinstance(retval, unicode):
             retval = retval.encode('utf-8', 'ignore')
         assert type(retval) == str
