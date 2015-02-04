@@ -68,6 +68,7 @@ class MessageSender(object):
         container['Subject'] = str(Header(subject, UTF8))
         container['From'] = self.from_header_from_address(fromAddress)
         container['To'] = self.to_header_from_addresses(toAddresses)
+        container['Date'] = curr_time().strftime('%a, %d %b %Y %H:%M:%S %z')
 
         # FIXME: The txtMessage argument should not have to be encoded.
         txt = MIMEText(txtMessage.encode(UTF8), 'plain', UTF8)
