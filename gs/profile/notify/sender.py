@@ -111,7 +111,7 @@ class MessageSender(object):
             userInfo = IGSUserInfo(u)
             retval = self.get_addr_line(userInfo.name, address)
         else:
-            name = self.siteInfo.name + _(' Support')
+            name = to_unicode_or_bust(self.siteInfo.name) + _(' Support')
             email = self.siteInfo.get_support_email()
             retval = self.get_addr_line(name, email)
         assert retval
