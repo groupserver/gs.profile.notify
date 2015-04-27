@@ -5,29 +5,29 @@ GroupServer Notifications
 :Authors: Alice Murphy; Michael JasonSmith
 :Contact: Michael JasonSmith <mpj17@onlinegroups.net>
 :Organization: `GroupServer.org`_
-:Date: 2014-09-03
-:Copyright: This document is licensed under a
-  `Creative Commons Attribution-Share Alike 3.0 New Zealand License`_
-  by `OnlineGroups.Net`_.
+:Date: 2015-04-27
+  `Creative Commons Attribution-Share Alike 4.0 International License`_
+  by `OnlineGroups.net`_.
+
+..  _Creative Commons Attribution-Share Alike 4.0 International License:
+    http://creativecommons.org/licenses/by-sa/4.0/
 
 .. contents:: `Table of contents`
    :depth: 2
 
-Notifications are small messages that are sent to the user outside the
-group-email context. They include messages such as the `invitation`_ to
-join a group, and the `group welcome`_ email. In this document we describe
-the various notifications sent by GroupServer. We summarise who they are
-sent to, and the code-path that is followed to send the notification.
+Notifications are small messages that are sent to the user
+outside the group-email context. They include messages such as
+the `invitation`_ to join a group, and the `group welcome`_
+email. In this document we describe the various notifications
+sent by GroupServer. We summarise who they are sent to, and the
+code-path that is followed to send the notification.
 
 Currently the notifications are being transitioned to their third
-version. These `file-system-side notifications`_ are are more flexible than
-the old `notification templates`_. The notifications in different
-sub-systems will be converted to file-system side notifications when each
-module is reviewed in the normal process of software maintenance and
-refactoring.
-
-Finally, we end with a review of the ListManager_ that sends email
-messages, and as responses to commands that are sent by email.
+version. These `file-system-side notifications`_ are are more
+flexible than the old `notification templates`_. The
+notifications in different sub-systems will be converted to
+file-system side notifications when each module is reviewed in
+the normal process of software maintenance and refactoring.
 
 File-System-Side Notifications
 ==============================
@@ -187,27 +187,48 @@ Topic Digest
 
 The topic digest contains a summary of the topics that were
 discussed recently in the group. A "cron-job" is used to
-regularly send out the digests. The digest system consists of
-three notifications: `the digest itself`_, the `digest on
-command`_, and the `digest off command`_.
+regularly send out the digests, using the ``senddigest``
+command. The digest system consists of two notifications: `the
+daily digest`_, and `the weekly digest`_. In addition there are
+two commands: the `digest on command`_, and the `digest off
+command`_.
 
-The digest itself
-~~~~~~~~~~~~~~~~~
+The daily digest
+~~~~~~~~~~~~~~~~
 
-The topic digest is the oldest file-system-side notifications. It
-was partly an experiment in how to create such a system. As
-such, it requires a rewrite to bring it into line with the other
-file-system-side notifications, which use the ``MessageSender`` class.
+The daily digest of topics topic digest is sent every day when
+there are posts. The digest 
 
-:Sent to: All group members who have elected to receive posts in digest form.
-:URL: *Group Page* ``/digest.txt``    
+:Sent to: All group members who have elected to receive posts in
+          digest form.
+:URL: *Group Page* ``gs-group-messages-topic-digest-daily.html``
 :via:
   | ``gs.group.messages.senddigest.script.main``
   | ``gs.group.messages.senddigest.script.send_digest``
-  | ``gs.group.messages.topicsdigest.sendDigest.SendAllDigests``
-  | ...
-  |   ``gs.group.messages.topicsdigest.notifiermessages.WeeklyMessage``
-  |   ``gs.group.messages.topicsdigest.notifiermessages.DailyMessage``
+  |  *Site page* ``gs-group-messages-topic-digest-send.html``
+  | ``gs.group.messages.topic.digest.base.sendDigests.SendDigests``
+  | [``gs.group.messages.topic.digest.daily.notifier.DailyDigestNotifier``]
+  | ``gs.group.messages.topic.digest.base.notifier.DigestNotifier.notify``
+  | ``gs.email.send_email``
+
+The weekly digest
+~~~~~~~~~~~~~~~~~
+
+The weekly digest is sent once a week, on the weekly-anniversary
+of the last post, if there have been no posts that week.
+
+:Sent to: All group members who have elected to receive posts in
+          digest form.
+:URL: *Group Page* ``gs-group-messages-topic-digest-weekly.html``
+:via:
+  | ``gs.group.messages.senddigest.script.main``
+  | ``gs.group.messages.senddigest.script.send_digest``
+  |  *Site page* ``gs-group-messages-topic-digest-send.html``
+  | ``gs.group.messages.topic.digest.base.sendDigests.SendDigests``
+  | [``gs.group.messages.topic.digest.weekly.notifier.WeeklyDigestNotifier``]
+  | ``gs.group.messages.topic.digest.base.notifier.DigestNotifier.notify``
+  | ``gs.email.send_email``
+
 
 Digest on command
 ~~~~~~~~~~~~~~~~~
@@ -451,90 +472,11 @@ A message to the group is received from a moderated member.
   | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
   | ``Products.CustomUserFolder.CustomUser.send_notification``
 
-   
-``ListManager``
-===============
-
-These notifications live in the ``ListManager`` instance within a
-GroupServer instance.  Some of them are sent via python scripts
-which also live in the ``ListManager``.  As the ``ListManager``
-is an instance of the ``XWFMailingListManager`` class, we
-distinguish the path to these scripts and notifications from
-attributes of the class by using the name ``ListManager`` instead
-of ``Products.XWFMailingListManager``, and using forward-slashes
-(``/``)instead of attribute notation (``.``).
-
-Much of these templates will be removed once we rebuild email
-processing [#RebuildEmail]_.
-
-``email_subscribe_key``
------------------------
-
-A subscribe command is received by the group mailing list.
-
-**Sent to**
-  ``The email address from which the command originated``
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.requestMail``
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_subscribe_key``
-
-
-``email_event_102``
--------------------
-
-A group member sends an email that breaches the message size limit to the group.
-
-**Sent to**
-  ``The email address from which the message originated``
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.mail_event_default``
-  | ``ListManager/xwf_email_event``
-
-
-``email_footer``
-----------------
-
-A post is sent out via email.
-
-**Sent to**
-  ``All group members who have their email delivery settings set to receive one`` 
-  ``post at a time``
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.manage_listboxer``
-  | ``Products.XWFMailingListManager.XWFMailingList.listMail``
-  |   ``Products.XWFMailingListManager.XWFMailingList.mail_footer``
-  |   ``ListManager/xwf_email_footer``
-  | ``Products.XWFMailingListManager.XWFMailingList.sendMail``
-    
-
-``email_header``
-----------------
-
-A post is sent out via email.
-
-**Sent to**
-  ``All group members who have their email delivery settings set to receive one``
-  ``post at a time``
-
-**via**
-  | ``Products.XWFMailingListManager.XWFMailingList.manage_listboxer``
-  | ``Products.XWFMailingListManager.XWFMailingList.listMail``
-  |   ``Products.XWFMailingListManager.XWFMailingList.mail_header``
-  |   ``ListManager/xwf_email_header``
-  | ``Products.XWFMailingListManager.XWFMailingList.sendMail``
-
-..  [#RebuildEmail] *Ticket 387: Rebuild Email Processing* is an 
-    important ticket, that summarises the necessary changes for
-    email processing <https://projects.iopen.net/groupserver/ticket/387>
-
 ..  [#Moderation] *Ticket 249: Rebuild Moderation* summarises the
     problems with moderation, and how to fix it
     <https://projects.iopen.net/groupserver/ticket/249>
   
 ..  _GroupServer.Org: http://groupserver.org/
 ..  _OnlineGroups.Net: http://onlinegroups.net/
-..  _Creative Commons Attribution-Share Alike 3.0 New Zealand License:
-    http://creativecommons.org/licenses/by-sa/3.0/nz/
+
+..  LocalWords:  refactoring
