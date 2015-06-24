@@ -32,12 +32,13 @@ the normal process of software maintenance and refactoring.
 File-System-Side Notifications
 ==============================
 
-As we rebuild each subsystem, we move its notifications to the file system,
-from the ZMI. The file-system-side notifications work like Web pages. The
-notification system renders two pages — an HTML page and a plain-text
-version of the same message — and places them in an email message. All of
-the new fine-system-side notifications use
-``gs.profile.notify.sender.MessageSender`` to send the message.
+As we rebuild each subsystem, we move its notifications to the
+file system, from the ZMI. The file-system-side notifications
+work like Web pages. The notification system renders two pages —
+an HTML page and a plain-text version of the same message — and
+places them in an email message. All of the new fine-system-side
+notifications use :class:`gs.profile.notify.sender.MessageSender`
+to send the message.
 
 Cannot Post
 -----------
@@ -58,11 +59,12 @@ profile see `unknown email address`_.
 Invitation
 ----------
 
-An invitation is a message from an administrator asking someone to
-join the group. It is also used to present the administrator with a
-*preview* of the invitation.
+An invitation is a message from an administrator asking someone
+to join the group. It is also used to present the administrator
+with a *preview* of the invitation.
 
-:Sent to: Someone who has been invited to join a group by the administrator.
+:Sent to: Someone who has been invited to join a group by the
+          administrator.
 :URL: *Group page* ``/invitationmessage.html``
 :via: Clicking *Invite*
 
@@ -70,7 +72,7 @@ join the group. It is also used to present the administrator with a
   | ``gs.group.member.invite.base.processor.InviteProcessor``
   | ``gs.group.member.invite.base.inviter.Inviter``
   | ``gs.group.member.invite.base.notify.InvitationNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
   |
   | Invite site member: ``gs.group.member.invite.invitesitemembers.GSInviteSiteMembersForm``
   | ``gs.group.member.invite.json.api.InviteUserAPI``
@@ -89,9 +91,10 @@ join the group. It is also used to present the administrator with a
 Group Welcome
 -------------
 
-The *Group Welcome* notification is sent to a new member when he or she
-joins a group. However, there are many ways of becoming a member, and some
-still use the old code, rather than this shiny method.
+The *Group Welcome* notification is sent to a new member when he
+or she joins a group. However, there are many ways of becoming a
+member, and some still use the old code, rather than this shiny
+method.
 
 Site administrators receive the `New Member`_ notification.
 
@@ -101,7 +104,7 @@ Site administrators receive the `New Member`_ notification.
 
   | ``gs.group.join.join.JoinForm``
   | ``gs.group.join.notify.NotifyNewMember``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
   |
   | A new **invited** member accepts an invitation to join a group
   | ``gs.profile.invite.initalresponse``
@@ -124,22 +127,22 @@ Information about the group that has just been started
 
   | ``gs.group.start.startgroup.StartGroupForm``
   | ``gs.group.start.notify.StartNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 New Member
 ----------
 
-Sent to the group administrators when a new member joins the group. It
-is the flip-side of the `group welcome`_ notification.
+Sent to the group administrators when a new member joins the
+group. It is the flip-side of the `group welcome`_ notification.
 
-:Sent to: The group administrators, or the site administrators if there are
-          no group administrators.
+:Sent to: The group administrators, or the site administrators if
+          there are no group administrators.
 :URL: *Group page* ``/new-member-admin-msg.html``
 :via: A *logged in member* clicks ``Join`` in a Public group.
 
   | ``gs.group.join.join.JoinForm``
   | ``gs.group.join.notify.NotifyAdmin``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
   |
   | A new **invited** member accepts an invitation to join a group
   | ``gs.profile.invite.initalresponse``
@@ -166,23 +169,23 @@ be confused with `request_contact`_.
 :URL: *Group page* ``/request_message.html``
 :via: The request membership form
   | ``gs.group.member.request.request.Request Form``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
   
 Reset password
 --------------
 
-A link to reset a password, sent to an email address that is submitted
-via the *Reset Password* page, when the email address is recognised
-as belonging to a user.
+A link to reset a password, sent to an email address that is
+submitted via the *Reset Password* page, when the email address
+is recognised as belonging to a user.
 
 :Sent to: The person that requested the password reset.
 :URL: ``gs-profile-password-reset-message.html`` in the context of a user.
 :via:
    | ``gs,profile.password.request.RequestPasswordResetForm``
    | ``gs,profile.password.notifier.ResetNotifier``
-   | ``gs.profile.notify.sender.MessageSender``
+   | :class:`gs.profile.notify.sender.MessageSender`
 
-Topic Digest
+Topic digest
 ------------
 
 The topic digest contains a summary of the topics that were
@@ -197,19 +200,19 @@ The daily digest
 ~~~~~~~~~~~~~~~~
 
 The daily digest of topics topic digest is sent every day when
-there are posts. The digest 
+there are posts. The digest
 
 :Sent to: All group members who have elected to receive posts in
           digest form.
 :URL: *Group Page* ``gs-group-messages-topic-digest-daily.html``
 :via:
-  | ``gs.group.messages.senddigest.script.main``
-  | ``gs.group.messages.senddigest.script.send_digest``
+  | ``gs.group.messages.topic.digest.send.script.main``
+  | ``gs.group.messages.topic.digest.send.script.send_digest``
   |  *Site page* ``gs-group-messages-topic-digest-send.html``
   | ``gs.group.messages.topic.digest.base.sendDigests.SendDigests``
   | [``gs.group.messages.topic.digest.daily.notifier.DailyDigestNotifier``]
   | ``gs.group.messages.topic.digest.base.notifier.DigestNotifier.notify``
-  | ``gs.email.send_email``
+  | :func:`gs.email.send_email`
 
 The weekly digest
 ~~~~~~~~~~~~~~~~~
@@ -229,7 +232,6 @@ of the last post, if there have been no posts that week.
   | ``gs.group.messages.topic.digest.base.notifier.DigestNotifier.notify``
   | ``gs.email.send_email``
 
-
 Digest on command
 ~~~~~~~~~~~~~~~~~
 
@@ -243,7 +245,7 @@ when a group member sends an email to the group with the subject
 :via:
    | ``gs.group.member.email.settings.listcommand.DigestCommand``
    | ``gs.group.member.email.settings.notifier.DigestOnNotifier``
-   | ``gs.profile.notify.sender.MessageSender``
+   | :class:`gs.profile.notify.sender.MessageSender`
 
 Digest off command
 ~~~~~~~~~~~~~~~~~~
@@ -258,8 +260,7 @@ when a group member sends an email to the group with the subject
 :via:
    | ``gs.group.member.email.settings.listcommand.DigestCommand``
    | ``gs.group.member.email.settings.notifier.DigestOffNotifier``
-   | ``gs.profile.notify.sender.MessageSender``
-
+   | :class:`gs.profile.notify.sender.MessageSender`
 
 Unknown Email Address
 ---------------------
@@ -300,7 +301,7 @@ sends the verification message for all higher-level code.
   | ``gs.profile.signup.base.request_registration.RequestRegistrationForm``
   | ``gs.profile.email.verify.emailverificationuser.EmailVerificationUser``
   | ``gs.profile.email.verify.notify.Notifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
   |
   | Adding a new email address, or sending another verification message
     during registration
@@ -322,7 +323,7 @@ the bounce on the extra address.
 
   | ``gs.group.member.bounce.handlebounce.HandleBounce``
   | ``gs.group.member.bounce.notifier.UserBounceNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 Disabled
 --------
@@ -341,7 +342,7 @@ an extra address.
 
   | ``gs.group.member.bounce.handlebounce.HandleBounce``
   | ``gs.group.member.bounce.notifier.UserDisabledNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 Disabled (administrator)
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -356,7 +357,7 @@ address disabled because of bouncing.
 
   | ``gs.group.member.bounce.handlebounce.HandleBounce``
   | ``gs.group.member.bounce.notifier.AdminDisabledNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 Leave
 -----
@@ -375,13 +376,13 @@ Leave (past member)
 
   | ``gs.group.member.leave.base.leave.LeaveForm``
   | ``gs.group.member.leave.base.notifier.LeaveNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 :via: The *Unsubscribe* command
 
   | ``gs.group.member.leave.command.LeaveCommand``
   | ``gs.group.member.leave.base.notifier.LeaveNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 Leave (administrator)
 ~~~~~~~~~~~~~~~~~~~~~
@@ -393,13 +394,13 @@ Leave (administrator)
 
   | ``gs.group.member.leave.base.leave.LeaveForm``
   | ``gs.group.member.leave.base.notifier.LeftNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 :via: The *Unsubscribe* command
 
   | ``gs.group.member.leave.command.LeaveCommand``
   | ``gs.group.member.leave.base.notifier.LeftNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 Not a member
 ~~~~~~~~~~~~
@@ -414,8 +415,24 @@ header does not match then a special *Not a Member* email is sent.
 
   | ``gs.group.member.leave.command.LeaveCommand``
   | ``gs.group.member.leave.command.notifiernonmember.NotMemberNotifier``
-  | ``gs.profile.notify.sender.MessageSender``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
+Profile status
+--------------
+
+The monthly profile-status notification is sent out monthly to
+everyone.
+
+:Sent to: Every person that is in at least one group in the
+          GroupServer install.
+:URL: *Site page* ``/gs-profile-status.html``
+:via:
+  | ``gs.profile.status.send.script.main``
+  | ``gs.group.messages.topic.digest.send.script.send_status``
+  |  *Site page* ``/gs-profile-status.html``
+  | ``gs.profile.status.base.hook.SendNotification``
+  | ``gs.profile.status.base.notifier.StatusNotifier``
+  | :class:`gs.profile.notify.sender.MessageSender`
 
 Notification Templates
 ======================
@@ -457,7 +474,6 @@ A message to the group is received from a moderated member.
   | ``Products.XWFMailingListManager.XWFMailingList.processMail``
   | ``Products.XWFMailingListManager.XWFMailingList.processModeration``
   | ``Products.CustomUserFolder.CustomUser.send_notification``
-
 
 ``mail_moderator``
 ~~~~~~~~~~~~~~~~~~

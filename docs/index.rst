@@ -14,9 +14,9 @@
 
 .. currentmodule:: gs.profile.notify
 
-Notifications are email messages that are sent to the user
-outside the group-email context. In this document list all the
-notifications in GroupServer_, discuss how to write a
+Notifications are email messages that GroupServer_ are sends
+outside the normal group-email context. In this document I list
+all the notifications in GroupServer_, discuss how to write a
 notification, and document the :class:`MessageSender` class,
 which sends a message to a person.
 
