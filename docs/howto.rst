@@ -121,13 +121,36 @@ with all styling removed and the remaining elements replaced with
 
 A notifier is what is called by the UI to send the message. It
 creates the HTML and text forms of the message, and sends it to
-the correct people.
+the correct people. Normally they notifier is a sub-class of the
+:class:`gs.content.email.base.NotifierABC` abstract base-class,
+or one of its subclasses [#EmailBase]_:
 
+.. code-block:: python
+
+    class DigestOnNotifier(GroupNotifierABC):
+        htmlTemplateName = 'gs-group-member-email-settings-digest-on.html'
+        textTemplateName = 'gs-group-member-email-settings-digest-on.txt'
+
+        def notify(self, userInfo):
+            subject = _('digest-on-subject',
+                        'Topic digests from ${groupName}',
+                        mapping={'groupName': self.groupInfo.name})
+            translatedSubject = translate(subject)
+            text = self.textTemplate()
+            html = self.htmlTemplate()
+
+            sender = MessageSender(self.context, userInfo)
+            sender.send_message(translatedSubject, text, html)
+            self.reset_content_type()
+    
 Initialisation:
-  The notifier needs access to both the ``request`` and ``context``.
-  Both need to be passed in from the UI.
+  The notifier needs access to both the ``request`` and
+  ``context``.  Because of this it is the responsibility of the
+  user-interfaces (normally forms) to send the notifications. It
+  is not the responsibility of the low-level code that actually
+  does the work.
 
-HTML Template:
+``htmlTemplate``:
   This *property* acquires the HTML view of the message. To do this it
   calls:
 
@@ -140,11 +163,11 @@ HTML Template:
   view for display. The view is not rendered until the ``notify`` method
   is called (see below).
 
-Text Template:
+``textTemplate``:
   This *property* works much the same way as the HTML Template property,
   but the name of the text-view is passed in.
 
-Notify:
+``notify``:
   This **method** does three things.
 
   #.  Renders the HTML and text versions of the message. It does
@@ -159,16 +182,12 @@ Notify:
   #.  Instantiating the :class:`MessageSender` class.
   #.  Calling the :func:`MessageSender.send_message` method.
 
-The main difference between the different Notify classes are
+The main difference between the different Notifier classes are
 different views are created (the names passed to the
 named-adaptor calls are different), and the ``notify`` method
 takes different arguments. These arguments are normally blindly
 passed on to the two views.
 
-The notifier requires a ``context`` and a ``request``. Because of
-this it is the responsibility of the user-interfaces (normally
-forms) to send the notifications. It is not the responsibility of
-the low-level code that actually does the work.
 
 .. _Michael: http://groupserver.org/p/mpj17
 
