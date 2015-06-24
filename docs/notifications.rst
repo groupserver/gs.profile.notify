@@ -373,14 +373,14 @@ Leave (past member)
 :URL: *Group page* ``/gs-group-member-leave-notification.html``
 :via: The *Leave* page
 
-  | ``gs.group.member.leave.leave.LeaveForm``
-  | ``gs.group.member.leave.notifier.LeaveNotifier``
+  | ``gs.group.member.leave.base.leave.LeaveForm``
+  | ``gs.group.member.leave.base.notifier.LeaveNotifier``
   | ``gs.profile.notify.sender.MessageSender``
 
 :via: The *Unsubscribe* command
 
   | ``gs.group.member.leave.command.LeaveCommand``
-  | ``gs.group.member.leave.notifier.LeaveNotifier``
+  | ``gs.group.member.leave.base.notifier.LeaveNotifier``
   | ``gs.profile.notify.sender.MessageSender``
 
 Leave (administrator)
@@ -391,14 +391,14 @@ Leave (administrator)
 :URL: *Group page* ``/gs-group-member-leave-left.html``
 :via: The *Leave* page
 
-  | ``gs.group.member.leave.leave.LeaveForm``
-  | ``gs.group.member.leave.notifier.LeftNotifier``
+  | ``gs.group.member.leave.base.leave.LeaveForm``
+  | ``gs.group.member.leave.base.notifier.LeftNotifier``
   | ``gs.profile.notify.sender.MessageSender``
 
 :via: The *Unsubscribe* command
 
   | ``gs.group.member.leave.command.LeaveCommand``
-  | ``gs.group.member.leave.notifier.LeftNotifier``
+  | ``gs.group.member.leave.base.notifier.LeftNotifier``
   | ``gs.profile.notify.sender.MessageSender``
 
 Not a member
@@ -412,8 +412,8 @@ header does not match then a special *Not a Member* email is sent.
       (**Note** not the *group* page.)
 :via: The *Unsubscribe* command
 
-  | ``gs.group.member.leave.listcommand.LeaveCommand``
-  | ``gs.group.member.leave.notifiernonmember.NotMemberNotifier``
+  | ``gs.group.member.leave.command.LeaveCommand``
+  | ``gs.group.member.leave.command.notifiernonmember.NotMemberNotifier``
   | ``gs.profile.notify.sender.MessageSender``
 
 

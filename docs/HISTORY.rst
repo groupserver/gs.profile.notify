@@ -1,6 +1,14 @@
 Changelog
 =========
 
+3.3.0 (2015-06-24)
+------------------
+
+* Moving the documentation to Sphinx and `Read the Docs`_
+
+.. _Read the Docs:
+   http://groupserver.readthedocs.org/projects/gsprofilenotify
+
 3.2.2 (2015-02-17)
 ------------------
 
@@ -20,7 +28,7 @@ Changelog
 * Unicode fixes to the audit trail
 * Updating the documentation
 
-.. _gs.profile.notify: https://github.com/groupserver/gs.profile.notify
+.. _GitHub: https://github.com/groupserver/gs.profile.notify
 
 3.1.3 (2014-06-11)
 ------------------

@@ -5,3 +5,5 @@ syntax: glob
 dist
 *orig
 *nja
+docs/_build
+README.html
