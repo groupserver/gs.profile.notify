@@ -25,8 +25,12 @@ outside the group-email context.
 Resources
 =========
 
-- Code repository: https://github.com/groupserver/gs.profile.notify
-- Questions and comments to http://groupserver.org/groups/development
+- Documentation:
+  http://groupserver.readthedocs.org/projects/gsprofilenotify/
+- Code repository:
+  https://github.com/groupserver/gs.profile.notify
+- Questions and comments to
+  http://groupserver.org/groups/development
 - Report bugs at https://redmine.iopen.net/projects/groupserver
 
 .. _GroupServer: http://groupserver.org/
