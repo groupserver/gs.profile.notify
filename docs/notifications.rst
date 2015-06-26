@@ -375,12 +375,14 @@ Leave (past member)
 :via: The *Leave* page
 
   | ``gs.group.member.leave.base.leave.LeaveForm``
+  | :func:`gs.group.member.leave.base.leave_group`
   | ``gs.group.member.leave.base.notifier.LeaveNotifier``
   | :class:`gs.profile.notify.sender.MessageSender`
 
 :via: The *Unsubscribe* command
 
   | ``gs.group.member.leave.command.LeaveCommand``
+  | :func:`gs.group.member.leave.base.leave_group`
   | ``gs.group.member.leave.base.notifier.LeaveNotifier``
   | :class:`gs.profile.notify.sender.MessageSender`
 
@@ -393,6 +395,7 @@ Leave (administrator)
 :via: The *Leave* page
 
   | ``gs.group.member.leave.base.leave.LeaveForm``
+  | :func:`gs.group.member.leave.base.leave_group`
   | ``gs.group.member.leave.base.notifier.LeftNotifier``
   | :class:`gs.profile.notify.sender.MessageSender`
 

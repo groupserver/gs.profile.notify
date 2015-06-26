@@ -366,4 +366,5 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/2.7', None),
     'gsemail': ('http://groupserver.readthedocs.org/projects/gsemail/en/latest/', None),
     'gscontentemailbase': ('http://groupserver.readthedocs.org/projects/gscontentemailbase/en/latest/', None),
+    'gscontentgroupmemberleavebase': ('http://groupserver.readthedocs.org/projects/gsgroupmemberleavebase/en/latest/', None),
 }
