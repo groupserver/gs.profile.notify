@@ -67,7 +67,7 @@ class NotifyUser(object):
             retval = [e.lower()
                       for e in self.emailUser.get_verified_addresses()]
         assert type(retval) == list
-        log.warn('%s has no email addresses to send the notification to.' %
+        log.warn('%s has no email addresses to send the notification to.',
                  self.user.getId())
         return retval
 
