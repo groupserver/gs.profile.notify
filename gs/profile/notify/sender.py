@@ -53,10 +53,9 @@ class MessageSender(object):
         msg = self.create_message(subject, txtMessage, htmlMessage,
                                   fromAddress, toAddresses)
         notifyUser = NotifyUser(self.toUserInfo.user)
-        if not toAddresses:
-            toAddresses = self.emailUser.get_delivery_addresses()
+        toAddrs = self.to_addresses(toAddresses)
         fromAddr = self.from_address(fromAddress)
-        for addr in toAddresses:
+        for addr in toAddrs:
             notifyUser.send_message(msg, addr, fromAddr)
 
     def create_message(self, subject, txtMessage, htmlMessage,
@@ -85,15 +84,42 @@ class MessageSender(object):
         assert retval
         return retval
 
+    def to_addresses(self, addresses):
+        '''Ensure we have the :mailheader:`To` addresses
+
+:param list addresses: The addresses.
+:returns: The ``addresses`` if it is ``True``, or the default delivery-address for the user
+          otherwise.
+:rtype: list
+
+This method ensures that we always set the :mailheader:`To` addresses'''
+        retval = addresses
+        if not addresses:
+            retval = self.emailUser.get_delivery_addresses()
+        return retval
+
     def from_address(self, address):
-        if address:
-            retval = address
-        else:
+        '''Ensure we have a :mailheader:`From` address
+
+:param str address: The address.
+:returns: The ``address`` if it is ``True``, or the default support email address otherwise.
+:rtype: str
+
+Through ignorance or malace we occasionally are passed no From address. This method ensures that
+we always set it'''
+        retval = address
+        if not address:
             retval = self.siteInfo.get_support_email()
         return retval
 
     @staticmethod
     def get_addr_line(name, addr):
+        '''Get the address line
+
+:param str name: The display-name in the address.
+:param str addr: The actual email address.
+:returns: A correctly formatted mail header.
+:rtype: str'''
         # --=mpj17=-- In Python 3 just using formataddr, sans the Header,
         #  will work. This method should be removed.
         unicodeName = to_unicode_or_bust(name)
@@ -104,13 +130,13 @@ class MessageSender(object):
 
     def from_header_from_address(self, address):
         if address:
+            name = ''
             u = self.context.acl_users.get_userByEmail(address)
-            if not u:
-                msg = 'Could not find user for <{0}>'.format(address)
-                raise ValueError(msg)
-            userInfo = IGSUserInfo(u)
-            retval = self.get_addr_line(userInfo.name, address)
-        else:
+            if u:
+                userInfo = IGSUserInfo(u)
+                name = userInfo.name
+            retval = self.get_addr_line(name, address)
+        else:  # not(address)
             name = to_unicode_or_bust(self.siteInfo.name) + _(' Support')
             email = self.siteInfo.get_support_email()
             retval = self.get_addr_line(name, email)
@@ -118,13 +144,12 @@ class MessageSender(object):
         return retval
 
     def to_header_from_addresses(self, addresses):
-        if not addresses:
-            addresses = self.emailUser.get_delivery_addresses()
-        if not addresses:
+        addrs = self.to_addresses(addresses)
+        if not addrs:
             m = 'No addresses for {0} ({1})'
             msg = m.format(self.toUserInfo.name, self.toUserInfo.id)
             raise ValueError(msg)
         fn = self.toUserInfo.name.encode(UTF8)
-        retval = ', '.join([self.get_addr_line(fn, a) for a in addresses])
+        retval = ', '.join([self.get_addr_line(fn, a) for a in addrs])
         assert retval
         return retval
