@@ -68,6 +68,8 @@ setup(
         'Products.GSAuditTrail',
         'Products.XWFCore',
     ],
+    test_suite="{0}.tests.test_all".format(name),
+    tests_require=['mock', ],
     extras_require={'docs': ['Sphinx'], },
     entry_points="""
     # -*- Entry points: -*-
