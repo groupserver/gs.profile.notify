@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.3.1 (2016-02-10)
+------------------
+
+* Handling missing ``From`` addresses better
+* Adding some unit tests
+
 3.3.0 (2015-06-24)
 ------------------
 
