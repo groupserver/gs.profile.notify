@@ -131,6 +131,17 @@ we always set it'''
         return retval
 
     def from_header_from_address(self, address):
+        '''Ensure we have a pretty address for the :mailheader:`From` header
+
+:param str address: The address.
+:returns: An email header, with the display-name and the email address ``address``.
+:rtype: str
+:raises ValueError: if a user cannot be found for the ``address``
+
+If the ``address`` is supplied then it is assumed to be the address of a
+**user**, and the display name will be set to the name of the user. Otherwise
+the support email-address will be returned, with the display name set to
+``${siteName} Support``.'''
         if address:
             name = ''
             u = self.context.acl_users.get_userByEmail(address)
