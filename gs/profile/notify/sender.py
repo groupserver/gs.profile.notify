@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ############################################################################
 #
-# Copyright © 2013 OnlineGroups.net and Contributors.
+# Copyright © 2013, 2016 OnlineGroups.net and Contributors.
 # All Rights Reserved.
 #
 # This software is subject to the provisions of the Zope Public License,
@@ -17,15 +17,17 @@ from email.Header import Header
 from email.MIMEText import MIMEText
 from email.MIMEMultipart import MIMEMultipart
 from email.utils import formataddr
+from zope.i18n import translate
 from zope.i18nmessageid import MessageFactory
 from zope.component import createObject
 from zope.cachedescriptors.property import Lazy
-_ = MessageFactory('groupserver')
 from gs.core import (to_unicode_or_bust, curr_time)
 from gs.profile.email.base.emailuser import EmailUser
 from Products.CustomUserFolder.interfaces import IGSUserInfo
 from .audit import Auditor, CREATE_MESSAGE
 from .notifyuser import NotifyUser
+
+_ = MessageFactory('gs.profile.notify')
 UTF8 = 'utf-8'
 
 
@@ -135,9 +137,14 @@ we always set it'''
             if u:
                 userInfo = IGSUserInfo(u)
                 name = userInfo.name
-            retval = self.get_addr_line(name, address)
+                retval = self.get_addr_line(name, address)
+            else:
+                msg = 'Cannot find a user for the address <{0}>'.format(address)
+                raise ValueError(msg)
         else:  # not(address)
-            name = to_unicode_or_bust(self.siteInfo.name) + _(' Support')
+            n = _('site-support', '${siteName} Support',
+                  mapping={'siteName': to_unicode_or_bust(self.siteInfo.name)})
+            name = translate(n)
             email = self.siteInfo.get_support_email()
             retval = self.get_addr_line(name, email)
         assert retval

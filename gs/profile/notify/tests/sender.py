@@ -84,9 +84,9 @@ class TestMessageSender(TestCase):
         context = MagicMock()
         context.acl_users.get_userByEmail.return_value = None
         ms = MessageSender(context, MagicMock())
-        r = ms.from_header_from_address('group@example.com')
 
-        self.assertEqual('group@example.com', r)
+        with self.assertRaises(ValueError):
+            ms.from_header_from_address('group@example.com')
 
     @patch('gs.profile.notify.sender.IGSUserInfo')
     def test_from_header_from_address_user(self, m_IGSUI):
