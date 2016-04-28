@@ -41,7 +41,7 @@ Resources
 =========
 
 - Documentation:
-  http://groupserver.readthedocs.org/projects/gsprofilenotify/
+  http://groupserver.readthedocs.io/projects/gsprofilenotify/
 - Code repository:
   https://github.com/groupserver/gs.profile.notify
 - Questions and comments to
