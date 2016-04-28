@@ -13,7 +13,7 @@ Changelog
 * Moving the documentation to Sphinx and `Read the Docs`_
 
 .. _Read the Docs:
-   http://groupserver.readthedocs.org/projects/gsprofilenotify
+   http://groupserver.readthedocs.io/projects/gsprofilenotify
 
 3.2.2 (2015-02-17)
 ------------------
