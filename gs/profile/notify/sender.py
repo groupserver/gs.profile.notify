@@ -66,10 +66,7 @@ class MessageSender(object):
         auditor.info(CREATE_MESSAGE, subject)
 
         container = MIMEMultipart('alternative')
-        container['Subject'] = str(Header(subject, UTF8))
-        container['From'] = self.from_header_from_address(fromAddress)
-        container['To'] = self.to_header_from_addresses(toAddresses)
-        container['Date'] = curr_time().strftime('%a, %d %b %Y %H:%M:%S %z')
+        self.set_headers(container)
 
         # FIXME: The txtMessage argument should not have to be encoded.
         txt = MIMEText(txtMessage.encode(UTF8), 'plain', UTF8)
@@ -85,6 +82,13 @@ class MessageSender(object):
         retval = container.as_string()
         assert retval
         return retval
+
+    def set_headers(self, container, subject, fromAddress, toAddresses):
+        container['Subject'] = str(Header(subject, UTF8))
+        container['From'] = self.from_header_from_address(fromAddress)
+        container['To'] = self.to_header_from_addresses(toAddresses)
+        container['Date'] = curr_time().strftime('%a, %d %b %Y %H:%M:%S %z')
+        return container
 
     def to_addresses(self, addresses):
         '''Ensure we have the :mailheader:`To` addresses
