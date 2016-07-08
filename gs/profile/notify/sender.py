@@ -66,7 +66,7 @@ class MessageSender(object):
         auditor.info(CREATE_MESSAGE, subject)
 
         container = MIMEMultipart('alternative')
-        self.set_headers(container)
+        self.set_headers(container, subject, fromAddress, toAddresses)
 
         # FIXME: The txtMessage argument should not have to be encoded.
         txt = MIMEText(txtMessage.encode(UTF8), 'plain', UTF8)
