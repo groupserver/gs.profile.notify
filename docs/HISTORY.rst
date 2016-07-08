@@ -1,6 +1,13 @@
 Changelog
 =========
 
+3.4.0 (2016-07-08)
+------------------
+
+* Making ``MessageSender.set_headers`` its own method
+* Updating the list of Notifications, because *Request contact*
+  is now a file-system side notification
+
 3.3.1 (2016-02-10)
 ------------------
 
