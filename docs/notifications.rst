@@ -163,12 +163,28 @@ Request Membership
 
 This message is sent when someone requests to become a member of a
 Private group. It is the opposite of a `invitation`_. It should not
-be confused with `request_contact`_.
+be confused with `Request Contact`_.
 
 :Sent to: The administrator of the group.
 :URL: *Group page* ``/request_message.html``
 :via: The request membership form
-  | ``gs.group.member.request.request.Request Form``
+  | ``gs.group.member.request.request.RequestForm``
+  | :class:`gs.profile.notify.sender.MessageSender`
+
+Request Contact
+---------------
+
+This notification is sent when a member reaches out to
+another. It allows the email address of everyone to be kept
+secret until they chose to disclose it. It is unusual because the
+:mailheader:`From` and :mailheader:`Reply-to` addresses are different.
+
+:Sent to: The person being contacted.
+:URL: *Profile page* ``/request_contact.html``
+:via: The request contact form
+  | ``gs.profile.contact.request.RequestContact``
+  | ``gs.profile.contact.notify.RequestNotifier``
+  | ``gs.profile.contact.notify.AlternateReplyMessageSender``
   | :class:`gs.profile.notify.sender.MessageSender`
   
 Reset password
@@ -443,21 +459,6 @@ Notification Templates
 These are the old notifications. They are DTML templates: this is the
 folder in which ``Products.CustomUserFolder.Customuser.send_notification``
 looks to find the notifications passed to it by ID.
-
-``request_contact``
--------------------
-
-A user requests contact with another.
-
-:Sent to: The member that is being petitioned for contact.
-
-:via:
-  | ``Products.GSProfile.request_contact.GSRequestContact.request_contact``
-  | ``Products.CustomUserFolder.CustomUser.send_notification``
-
-:See also: `Feature 3409`_
-
-.. _Feature 3409: https://redmine.iopen.net/issues/3409
 
 Moderation
 ----------
