@@ -13,6 +13,7 @@
 #
 ############################################################################
 from __future__ import absolute_import, unicode_literals, print_function
+from email.MIMEMultipart import MIMEMultipart
 from mock import (MagicMock, patch, PropertyMock)
 from unittest import TestCase
 from gs.profile.notify.sender import MessageSender
@@ -148,6 +149,24 @@ class TestMessageSender(TestCase):
         r = ms.to_header_from_addresses(addr)
 
         self.assertEqual('Example Person <person@example.com>', r)
+
+    @patch.object(MessageSender, 'from_header_from_address')
+    @patch.object(MessageSender, 'to_header_from_addresses')
+    def test_set_headers(self, m_to, m_from):
+        m_to.return_value = 'person@example.com'
+        m_from.return_value = 'support@example.com'
+        container = MIMEMultipart('alternative')
+        ms = MessageSender(MagicMock(), MagicMock())
+        subj = 'Ethel the Frog'
+        ms.set_headers(container, subj, 'mockFrom', 'mockTo')
+
+        self.assertEqual(subj, container['Subject'])
+        m_from.assert_called_once_with('mockFrom')
+        self.assertEqual(m_from(), container['From'])
+        m_to.assert_called_once_with('mockTo')
+        self.assertEqual(m_to(), container['To'])
+        # Only test the presence of a date, because race-conditions with dates
+        self.assertIn('Date', container)
 
     @patch.object(MessageSender, 'siteInfo', new_callable=PropertyMock)
     @patch.object(MessageSender, 'emailUser', new_callable=PropertyMock)
